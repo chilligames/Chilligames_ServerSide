@@ -1,0 +1,13 @@
+{
+  "name": "chilligames_server_side",
+  "version": "0.0.0",
+  "description": "Chilligames_server_side",
+  "main": "Admin.js",
+  "author": {
+    "name": ""
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongodb": "^3.2.7"
+  }
+}
