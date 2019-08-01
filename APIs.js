@@ -4,7 +4,7 @@ var app_api = Express();
 app_api.get("/APIs", (req, res) => {
     var DB = new DB_model();
     var pipe_line = req.header("Pipe_line");
-    var ID = req.header("ID");
+    var _id = req.header("_id");
 
 
     switch (pipe_line) {
@@ -15,6 +15,16 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
 
+
+        } break;
+        case "QL": {
+
+            DB.Quick_login(_id).then(result => {
+
+                res.send(result);
+                res.end();
+
+            });
 
         } break;
 
@@ -70,9 +80,17 @@ class DB_model {
 
         connected.close();
 
-        console.log(Result_insert.insertedId);
-
         return Result_insert.insertedId.toHexString();
+    }
+
+
+    async Quick_login(Incoming_id) {
+
+        var _id = new mongo_raw.ObjectId(Incoming_id);
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var result_search = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+        Connection.close();
+        return result_search;
     }
 
 
