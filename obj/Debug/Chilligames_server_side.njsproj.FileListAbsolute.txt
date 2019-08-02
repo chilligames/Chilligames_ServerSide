@@ -1,0 +1,3 @@
+C:\Users\ph0b14\Desktop\Chilligames_serverside\Chilligames_ServerSide\obj\Debug\Chilligames_server_side.njsprojAssemblyReference.cache
+C:\Users\ph0b14\Desktop\Chilligames_serverside\Chilligames_ServerSide\obj\Debug\Chilligames_server_side.njsproj.CoreCompileInputs.cache
+C:\Users\ph0b14\Desktop\Chilligames_serverside\Chilligames_ServerSide\bin\Microsoft.NodejsTools.WebRole.dll

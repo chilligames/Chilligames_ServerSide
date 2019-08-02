@@ -5,8 +5,9 @@ app_api.get("/APIs", (req, res) => {
     var DB = new DB_model();
     var pipe_line = req.header("Pipe_line");
     var _id = req.header("_id");
-
-
+    var leader_board = req.header("Leader_board");
+    var Score = req.header("Score");
+    var Nick_name = req.header("Nick_name");
     switch (pipe_line) {
         case "QR": {
 
@@ -25,6 +26,11 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
 
             });
+
+        } break;
+        case "SSTLB": {
+
+            DB.Send_data_to_leader_board(_id, leader_board, Score, Nick_name).then(() => { });
 
         } break;
 
@@ -47,8 +53,10 @@ class DB_model {
 
     Raw_Model_User = {
         "Identities": [
-            0 = '',
-            1 = ''
+            'Enter_user_name',
+            'password',
+            'Email',
+            'Nickname',
         ],
         "Ban": [],
         "Friends": [],
@@ -56,14 +64,20 @@ class DB_model {
         "Log": [],
         "Files": [],
         "Data": [
-            0 = '',
-            1 = ''
+            [],
+            []
         ],
         "Inventory": [],
         "Notifactions": [],
         "Teams": [],
         "Wallet": [],
         "Servers": []
+    }
+
+    Raw_model_leader_board = {
+        ID: '',
+        Nick_name: '',
+        Score: ''
     }
 
 
@@ -89,4 +103,24 @@ class DB_model {
     }
 
 
+    async Send_data_to_leader_board(incoming_id, incoming_leaderboard_name, incoming_Score, Incoming_nick_name) {
+
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        this.Raw_model_leader_board= await connection.db("Chilligames").collection(incoming_leaderboard_name).findOne({ 'Nick_name': Incoming_nick_name });
+
+        if (this.Raw_model_leader_board.Nick_name==Incoming_nick_name) {
+
+            if (incoming_Score  > this.Raw_model_leader_board.Score) {
+
+                this.Raw_model_leader_board.Score = incoming_Score;
+                await connection.db("Chilligames").collection(incoming_leaderboard_name).updateOne({ 'Nick_name': Incoming_nick_name }, { $set: { "Score": incoming_Score } });//cheack last edit
+            }
+
+        }
+
+        console.log(this.Raw_model_leader_board.Nick_name);
+
+
+
+    }
 }
