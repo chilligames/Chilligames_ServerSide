@@ -46,24 +46,19 @@ class DB_model {
 
 
     Raw_Model_User = {
-        "Identities": {
-            "Frist_Login": '',
-            "Password": '',
-            "Username": '',
-            "Display_name": '',
-            "Email": '',
-            "Language": '',
-            "Last_login": ''
-        },
+        "Identities": [
+            0 = '',
+            1 = ''
+        ],
         "Ban": [],
         "Friends": [],
         "Avatar": '',
         "Log": [],
         "Files": [],
-        "Data": {
-            "Public": [],
-            "Internal": []
-        },
+        "Data": [
+            0 = '',
+            1 = ''
+        ],
         "Inventory": [],
         "Notifactions": [],
         "Teams": [],
