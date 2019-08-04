@@ -52,12 +52,12 @@ class DB_model {
 
 
     Raw_Model_User = {
-        "Identities": [
-            'Enter_user_name',
-            'password',
-            'Email',
-            'Nickname',
-        ],
+        "Info": {
+            "Username": '',
+            'Password': '',
+            'Email': '',
+            'Nickname': '',
+        },
         "Ban": [],
         "Friends": [],
         "Avatar": '',
@@ -71,7 +71,8 @@ class DB_model {
         "Notifactions": [],
         "Teams": [],
         "Wallet": [],
-        "Servers": []
+        "Servers": [],
+        "Leader_board": {}
     }
 
     Raw_model_leader_board = {
@@ -107,8 +108,6 @@ class DB_model {
 
 
         if (Incoming_nick_name.length > 2) {
-
-            console.log("A");
             var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
             this.Raw_model_leader_board = await connection.db("Chilligames").collection(incoming_leaderboard_name).findOne({ 'Nick_name': Incoming_nick_name });
 
@@ -117,17 +116,41 @@ class DB_model {
                 this.Raw_model_leader_board.Score = incoming_Score;
                 var result_inject_Score = await connection.db("Chilligames").collection(incoming_leaderboard_name).updateOne({ 'Nick_name': Incoming_nick_name }, { $set: { "Score": incoming_Score } });
 
+
+                if (result_inject_Score.result.ok == 1) {
+
+                    this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ 'Info.Nickname': Incoming_nick_name });
+
+                    if (this.Raw_Model_User.Leader_board[incoming_leaderboard_name]!=undefined) {
+
+                        //last change 
+                      
+                        connection.db("Chilligames").collection("Users").updateOne({ 'Info.Nickname': Incoming_nick_name }, { $push{'Leader_board':})
+                  
+                    
+                    
+                    } else {
+                        console.log("score nist");
+                    }
+                    console.log(this.Raw_Model_User.Leader_board[incoming_leaderboard_name]);
+
+                }
+
             }
+            else {
+                //code register new leader board here
+
+            }
+
+
         } else {
 
             var Connection_2 = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
             this.Raw_model_leader_board = await Connection_2.db("Chilligames").collection(incoming_leaderboard_name).findOne({ 'ID': incoming_id });
-            console.log(this.Raw_model_leader_board);
-            console.log(incoming_id);
+
             if (this.Raw_model_leader_board.ID == incoming_id && incoming_Score > this.Raw_model_leader_board.Score) {
-                console.log("inject");
+
                 var result_inject_Score = await Connection_2.db("Chilligames").collection(incoming_leaderboard_name).updateOne({ 'ID': incoming_id }, { $set: { "Score": incoming_Score } });
-                console.log(result_inject_Score.result);
             }
         }
 
