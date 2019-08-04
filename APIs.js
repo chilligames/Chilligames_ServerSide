@@ -76,7 +76,7 @@ class DB_model {
 
     Raw_model_leader_board = {
         ID: '',
-        Nick_name: '',
+        Nick_name: 0,
         Score: ''
     }
 
@@ -103,22 +103,34 @@ class DB_model {
     }
 
 
-    async Send_data_to_leader_board(incoming_id, incoming_leaderboard_name, incoming_Score, Incoming_nick_name) {
+    async Send_data_to_leader_board(incoming_id, incoming_leaderboard_name, incoming_Score, Incoming_nick_name = String) {
 
-        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
-        this.Raw_model_leader_board= await connection.db("Chilligames").collection(incoming_leaderboard_name).findOne({ 'Nick_name': Incoming_nick_name });
 
-        if (this.Raw_model_leader_board.Nick_name==Incoming_nick_name) {
+        if (Incoming_nick_name.length > 2) {
 
-            if (incoming_Score  > this.Raw_model_leader_board.Score) {
+            console.log("A");
+            var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+            this.Raw_model_leader_board = await connection.db("Chilligames").collection(incoming_leaderboard_name).findOne({ 'Nick_name': Incoming_nick_name });
 
-                this.Raw_model_leader_board.Score = incoming_Score;
-                await connection.db("Chilligames").collection(incoming_leaderboard_name).updateOne({ 'Nick_name': Incoming_nick_name }, { $set: { "Score": incoming_Score } });//cheack last edit
+            if (this.Raw_model_leader_board.Nick_name == Incoming_nick_name) {
+
+                if (incoming_Score > this.Raw_model_leader_board.Score) {
+                    this.Raw_model_leader_board.Score = incoming_Score;
+                    var result_inject = await connection.db("Chilligames").collection(incoming_leaderboard_name).updateOne({ 'Nick_name': Incoming_nick_name }, { $set: { "Score": incoming_Score } });
+                }
+
             }
+        } else {
 
+            console.log("B");
+
+            var Connection_2 = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+            //this.Raw_model_leader_board = await Connection_2.db("Chilligames").collection(incoming_leaderboard_name).find({ 'ID': incoming_id });
+
+            console.log(this.Raw_Model_User);
         }
 
-        console.log(this.Raw_model_leader_board.Nick_name);
+
 
 
 
