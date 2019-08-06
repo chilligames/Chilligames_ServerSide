@@ -43,6 +43,10 @@ app_api.get("/APIs", (req, res) => {
             DB.Recive_leader_board_near_by_user(_id, leader_board_name);
 
         } break;
+        case "RSU": {
+
+            DB.Recive_Score_Player(_id, leader_board_name);
+        } break;
     }
 
 
@@ -186,8 +190,15 @@ class DB_model {
 
     }
 
-    async Recive_Score_user(Incomin_id, Incomin_leader_board_name) {
 
-
+    async Recive_Score_Player(Incomin_id, Incomin_leader_board_name) {
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var _id = new mongo_raw.ObjectID(Incomin_id);
+        this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+        console.log(this.Raw_Model_User.Leader_board[Incomin_leader_board_name]);
+        return this.Raw_Model_User.Leader_board[Incomin_leader_board_name];
     }
+
+    
+
 }
