@@ -185,4 +185,9 @@ class DB_model {
         console.log(result_recive_leader_board);
 
     }
+
+    async Recive_Score_user(Incomin_id, Incomin_leader_board_name) {
+
+
+    }
 }
