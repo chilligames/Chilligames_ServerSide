@@ -5,7 +5,8 @@ app_api.get("/APIs", (req, res) => {
     var DB = new DB_model();
     var pipe_line = req.header("Pipe_line");
     var _id = req.header("_id");
-    var leader_board = req.header("Leader_board");
+    var leader_board_name = req.header("Leader_board");
+    var leader_board_count = req.header("Leader_board_count")
     var Score = req.header("Score");
     var Nick_name = req.header("Nick_name");
     switch (pipe_line) {
@@ -30,10 +31,13 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "SSTLB": {
 
-            DB.Send_data_to_leader_board(_id, leader_board, Score, Nick_name).then(() => { });
+            DB.Send_data_to_leader_board(_id, leader_board_name, Score, Nick_name).then(() => { });
 
         } break;
+        case "RLB": {
 
+            DB.Recive_leader_board(leader_board_name, leader_board_count).then(() => { });
+        } break;
     }
 
 
@@ -157,6 +161,13 @@ class DB_model {
     }
 
 
+    async Recive_leader_board(incoming_name_leader_board, incoming_count = Number()) {
 
+        var count = Number(incoming_count);
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var result_search = await Connection.db("Chilligames").collection(incoming_name_leader_board).find({}, { limit: count, sort: { 'Score': -1 } }).toArray();
+        return result_search;
+    }
+    
 
 }
