@@ -88,6 +88,12 @@ class DB_model {
 
         var Result_insert = await connected.db("Chilligames").collection("Users").insertOne(this.Raw_Model_User);
 
+        var _id = new mongo_raw.ObjectId(Result_insert.insertedId);
+
+        this.Raw_Model_User.Info.Nickname = _id.toHexString();
+
+        await connected.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { "Info.Nickname": this.Raw_Model_User.Info.Nickname } });
+
         connected.close();
 
         return Result_insert.insertedId.toHexString();
@@ -122,22 +128,35 @@ class DB_model {
                 this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = incoming_Score;
 
                 await connection.db("Chilligames").collection("Users").updateOne({ 'Info.Nickname': Incoming_nick_name }, { $set: { "Leader_board": this.Raw_Model_User.Leader_board } });
-
             }
-
         }
         else {
 
             var Connection_2 = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+
             this.Raw_model_leader_board = await Connection_2.db("Chilligames").collection(incoming_leaderboard_name).findOne({ 'ID': incoming_id });
 
             if (this.Raw_model_leader_board.ID == incoming_id && incoming_Score > this.Raw_model_leader_board.Score) {
 
-                var result_inject_Score = await Connection_2.db("Chilligames").collection(incoming_leaderboard_name).updateOne({ 'ID': incoming_id }, { $set: { "Score": incoming_Score } });
+                await Connection_2.db("Chilligames").collection(incoming_leaderboard_name).updateOne({ 'ID': incoming_id }, { $set: { "Score": incoming_Score } });
+
+
+                var _id = new mongo_raw.ObjectId(incoming_id);
+
+                this.Raw_Model_User = await Connection_2.db("Chilligames").collection("Users").findOne({ '_id': _id });
+
+                this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = incoming_Score;
+
+                await Connection_2.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { "Leader_board": this.Raw_Model_User.Leader_board } });
             }
+
         }
 
 
 
     }
+
+
+
+
 }
