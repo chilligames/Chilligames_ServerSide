@@ -38,6 +38,11 @@ app_api.get("/APIs", (req, res) => {
 
             DB.Recive_leader_board(leader_board_name, leader_board_count).then(() => { });
         } break;
+        case "SLBNBY": {
+
+            DB.Recive_leader_board_near_by_user(_id, leader_board_name);
+
+        } break;
     }
 
 
@@ -168,6 +173,16 @@ class DB_model {
         var result_search = await Connection.db("Chilligames").collection(incoming_name_leader_board).find({}, { limit: count, sort: { 'Score': -1 } }).toArray();
         return result_search;
     }
-    
 
+
+    async Recive_leader_board_near_by_user(incoming_id, Incoming_leader_board_name) {
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var _id = new mongo_raw.ObjectId(incoming_id);
+        this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+        var Score_player = Number(this.Raw_Model_User.Leader_board[Incoming_leader_board_name]);
+        console.log(Score_player);
+        var result_recive_leader_board = await connection.db("Chilligames").collection(Incoming_leader_board_name).find({ 'Score': { $lt: Score_player } }, { limit: 5 }).toArray();
+        console.log(result_recive_leader_board);
+
+    }
 }
