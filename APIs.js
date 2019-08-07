@@ -9,6 +9,9 @@ app_api.get("/APIs", (req, res) => {
     var leader_board_count = req.header("Leader_board_count")
     var Score = req.header("Score");
     var Nick_name = req.header("Nick_name");
+    var Data_user = req.header("Data_user");
+    var Name_App = req.header("Name_App");
+
     switch (pipe_line) {
         case "QR": {
 
@@ -54,6 +57,14 @@ app_api.get("/APIs", (req, res) => {
         case "RIU": {
             DB.Recive_info_user(_id);
         }
+        case "SDU": {
+
+            DB.Send_data_user(_id, Data_user, Name_App);
+
+        } break;
+        case "RDU": {
+            DB.recive_data_user(_id, Name_App);
+        } break;
     }
 
 
@@ -83,14 +94,15 @@ class DB_model {
         "Avatar": '',
         "Log": [],
         "Files": [],
-        "Data": [
-            [],
-            []
-        ],
+        "Data": {},
         "Inventory": [],
         "Notifactions": [],
         "Teams": [],
-        "Wallet": [],
+        "Wallet": {
+            "Coin": "",
+            "Mony": ""
+
+        },
         "Servers": [],
         "Leader_board": {}
     }
@@ -214,10 +226,31 @@ class DB_model {
         return search_user;
     }
 
+
     async Recive_info_user(Incoming_id) {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var _id = new mongo_raw.ObjectId(Incoming_id);
         var result_find_user = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
         return result_find_user;
+    }
+
+
+    async Send_data_user(Incoming_id, Incomin_data, Incoming_name_app) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var _id = new mongo_raw.ObjectId(Incoming_id);
+
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+        this.Raw_Model_User.Data[Incoming_name_app] = JSON.parse(Incomin_data);
+
+        await Connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { 'Data': this.Raw_Model_User.Data } });
+
+    }
+
+
+    async recive_data_user(Incoming_id, Incoming_name_app) {
+
+
+
     }
 }
