@@ -56,7 +56,7 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "RIU": {
             DB.Recive_info_user(_id);
-        }
+        } break;
         case "SDU": {
 
             DB.Send_data_user(_id, Data_user, Name_App);
@@ -249,8 +249,13 @@ class DB_model {
 
 
     async recive_data_user(Incoming_id, Incoming_name_app) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var _id = new mongo_raw.ObjectId(Incoming_id);
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
 
+        console.log(this.Raw_Model_User.Data[Incoming_name_app]);
 
+        return this.Raw_Model_User.Data[Incoming_name_app];
 
     }
 }
