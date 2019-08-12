@@ -72,7 +72,7 @@ app_api.get("/APIs", (req, res) => {
         case "RRP": {
             DB.recive_ranking_posion(_id, leader_board_name).then(Rank => {
 
-                res.send(Rank);
+                res.send(Rank.toString());
                 res.end();
             });
         } break;
