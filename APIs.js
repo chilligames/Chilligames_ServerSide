@@ -59,7 +59,10 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "SDU": {
 
-            DB.Send_data_user(_id, Data_user, Name_App);
+            DB.Send_data_user(_id, Data_user, Name_App).then(() => {
+                res.end();
+
+            });
 
         } break;
         case "RDU": {
@@ -241,9 +244,10 @@ class DB_model {
         var _id = new mongo_raw.ObjectId(Incoming_id);
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
-        this.Raw_Model_User.Data[Incoming_name_app] = JSON.parse(Incomin_data);
-
+        var serilize_data = JSON.parse(Incomin_data);
+        this.Raw_Model_User.Data[Incoming_name_app] =serilize_data;
         await Connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { 'Data': this.Raw_Model_User.Data } });
+        Connection.close();
 
     }
 
