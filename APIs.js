@@ -69,6 +69,13 @@ app_api.get("/APIs", (req, res) => {
         case "RDU": {
             DB.recive_data_user(_id, Name_App);
         } break;
+        case "RRP": {
+            DB.recive_ranking_posion(_id, leader_board_name).then(Rank => {
+
+                res.send(Rank);
+                res.end();
+            });
+        } break;
     }
 
 
@@ -168,8 +175,6 @@ class DB_model {
             connection.close();
 
         } else {
-
-            console.log(this.Raw_model_leader_board);
             await connection.db("Chilligames").collection(incoming_leaderboard_name).updateOne({ 'ID': incoming_id }, { $set: { 'Score': Number(incoming_Score) } });
             this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = Number(incoming_Score);
 
@@ -250,6 +255,16 @@ class DB_model {
         console.log(this.Raw_Model_User.Data[Incoming_name_app]);
 
         return this.Raw_Model_User.Data[Incoming_name_app];
+
+    }
+
+    async recive_ranking_posion(Incomin_id, Incomin_leader_board_name) {
+
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        this.Raw_model_leader_board = await connection.db("Chilligames").collection(Incomin_leader_board_name).findOne({ 'ID': Incomin_id });
+        var pos = await connection.db("Chilligames").collection(Incomin_leader_board_name).find({ "Score": { $gt: this.Raw_model_leader_board.Score } }, { sort: { "Score": -1 } }).toArray();
+        connection.close();
+        return pos.length;
 
     }
 }
