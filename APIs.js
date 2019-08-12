@@ -34,7 +34,9 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "SSTLB": {
 
-            DB.Send_data_to_leader_board(_id, leader_board_name, Score, Nick_name).then(() => { });
+            DB.Send_Score_to_leader_board(_id, leader_board_name, Score).then(() => {
+                res.end();
+            });
 
         } break;
         case "RLB": {
@@ -111,9 +113,9 @@ class DB_model {
     }
 
     Raw_model_leader_board = {
-        ID: '',
-        Nick_name: 0,
-        Score: ''
+        'ID': '',
+        'Nick_name': '',
+        'Score': 0
     }
 
 
@@ -145,46 +147,35 @@ class DB_model {
     }
 
 
-    async Send_data_to_leader_board(incoming_id = String, incoming_leaderboard_name, incoming_Score = Int32Array, Incoming_nick_name = String) {
+    async Send_Score_to_leader_board(incoming_id, incoming_leaderboard_name, incoming_Score = Number()) {
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var _id = new mongo_raw.ObjectId(incoming_id);
 
+        this.Raw_model_leader_board = await connection.db("Chilligames").collection(incoming_leaderboard_name).findOne({ 'ID': incoming_id });
+        this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
 
-        if (Incoming_nick_name.length > 2) {
-            var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
-            this.Raw_model_leader_board = await connection.db("Chilligames").collection(incoming_leaderboard_name).findOne({ 'Nick_name': Incoming_nick_name });
+        if (this.Raw_model_leader_board == null) {
 
-            if (this.Raw_model_leader_board.Nick_name == Incoming_nick_name && incoming_Score > this.Raw_model_leader_board.Score) {
+            var new_leader_board = {
+                'ID': incoming_id,
+                'Nick_name': this.Raw_Model_User.Info.Nickname,
+                'Score': Number(incoming_Score)
+            };
+            await connection.db("Chilligames").collection(incoming_leaderboard_name).insertOne(new_leader_board);
 
-                this.Raw_model_leader_board.Score = incoming_Score;
+            this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = Number(incoming_Score);
 
-                await connection.db("Chilligames").collection(incoming_leaderboard_name).updateOne({ 'Nick_name': Incoming_nick_name }, { $set: { "Score": incoming_Score } });
+            await connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { "Leader_board": this.Raw_Model_User.Leader_board } });
+            connection.close();
 
-                this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ 'Info.Nickname': Incoming_nick_name });
+        } else {
 
-                this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = incoming_Score;
+            console.log(this.Raw_model_leader_board);
+            await connection.db("Chilligames").collection(incoming_leaderboard_name).updateOne({ 'ID': incoming_id }, { $set: { 'Score': Number(incoming_Score) } });
+            this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = Number(incoming_Score);
 
-                await connection.db("Chilligames").collection("Users").updateOne({ 'Info.Nickname': Incoming_nick_name }, { $set: { "Leader_board": this.Raw_Model_User.Leader_board } });
-            }
-        }
-        else {
-
-            var Connection_2 = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
-
-            this.Raw_model_leader_board = await Connection_2.db("Chilligames").collection(incoming_leaderboard_name).findOne({ 'ID': incoming_id });
-
-            if (this.Raw_model_leader_board.ID == incoming_id && incoming_Score > this.Raw_model_leader_board.Score) {
-
-                await Connection_2.db("Chilligames").collection(incoming_leaderboard_name).updateOne({ 'ID': incoming_id }, { $set: { "Score": incoming_Score } });
-
-
-                var _id = new mongo_raw.ObjectId(incoming_id);
-
-                this.Raw_Model_User = await Connection_2.db("Chilligames").collection("Users").findOne({ '_id': _id });
-
-                this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = incoming_Score;
-
-                await Connection_2.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { "Leader_board": this.Raw_Model_User.Leader_board } });
-            }
-
+            await connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { 'Leader_board': this.Raw_Model_User.Leader_board } });
+            connection.close();
         }
 
 
@@ -245,7 +236,7 @@ class DB_model {
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
         var serilize_data = JSON.parse(Incomin_data);
-        this.Raw_Model_User.Data[Incoming_name_app] =serilize_data;
+        this.Raw_Model_User.Data[Incoming_name_app] = serilize_data;
         await Connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { 'Data': this.Raw_Model_User.Data } });
         Connection.close();
 
