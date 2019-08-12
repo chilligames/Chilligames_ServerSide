@@ -8,7 +8,6 @@ app_api.get("/APIs", (req, res) => {
     var leader_board_name = req.header("Leader_board");
     var leader_board_count = req.header("Leader_board_count")
     var Score = req.header("Score");
-    var Nick_name = req.header("Nick_name");
     var Data_user = req.header("Data_user");
     var Name_App = req.header("Name_App");
 
