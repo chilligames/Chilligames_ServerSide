@@ -10,7 +10,11 @@ app_api.get("/APIs", (req, res) => {
     var Score = req.header("Score");
     var Data_user = req.header("Data_user");
     var Name_App = req.header("Name_App");
-
+    var Nickname = req.header("Nickname");
+    var Username = req.header("Username");
+    var Email = req.header("Email");
+    var Password = req.header("Password");
+    var Status = req.header("Status");
     switch (pipe_line) {
         case "QR": {
 
@@ -76,6 +80,14 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "UUI": {
+
+            DB.Update_User_Info(_id, Nickname, Username, Email, Password, Status).then(() => {
+
+                res.end();
+
+            });
+        } break;
     }
 
 
@@ -99,6 +111,7 @@ class DB_model {
             'Password': '',
             'Email': '',
             'Nickname': '',
+            'Status': ''
         },
         "Ban": [],
         "Friends": [],
@@ -270,9 +283,50 @@ class DB_model {
     }
 
 
-    async Change_info_user(Incoming_nickname, Incoming_username, Incoming_Email, Incoming_password, Incoming_status) {
+    async Update_User_Info(Incoming_id, Incoming_nickname = String(), Incoming_username = String(), Incoming_Email = String(), Incoming_password = String(), Incoming_status = String()) {
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var _id = new mongo_raw.ObjectId(Incoming_id);
 
+        if (Incoming_nickname.length > 1) {
 
+            var result_search_nickname = await connection.db("Chilligames").collection("Users").findOne({ "Info.Nickname": Incoming_nickname });
 
+            if (result_search_nickname == null) {
+
+                await connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { "Info.Nickname": Incoming_nickname } });
+            }
+
+        }
+
+        if (Incoming_username.length > 1) {
+
+            var result_search_user_name = await connection.db("Chilligames").collection("Users").findOne({ "Info.Username": Incoming_username });
+            if (result_search_user_name == null) {
+
+                await connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Info.Username': Incoming_username } });
+            }
+
+        }
+
+        if (Incoming_Email.length > 1) {
+
+            var result_search_Email = await connection.db("Chilligames").collection("Users").findOne({ "Info.Email": Incoming_Email });
+
+            if (result_search_Email == null) {
+                await connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { "Info.Email": Incoming_Email } });
+
+            }
+
+        }
+
+        if (Incoming_password.length > 1) {
+            await connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { "Info.Password": Incoming_password } });
+        }
+        if (Incoming_status.length > 1) {
+            await connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { "Info.Status": Incoming_status } });
+        }
+
+        connection.close();
     }
+
 }
