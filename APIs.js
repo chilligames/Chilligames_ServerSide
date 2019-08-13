@@ -258,6 +258,7 @@ class DB_model {
 
     }
 
+
     async recive_ranking_posion(Incomin_id, Incomin_leader_board_name) {
 
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
@@ -265,6 +266,13 @@ class DB_model {
         var pos = await connection.db("Chilligames").collection(Incomin_leader_board_name).find({ "Score": { $gt: this.Raw_model_leader_board.Score } }, { sort: { "Score": -1 } }).toArray();
         connection.close();
         return pos.length;
+
+    }
+
+
+    async Change_info_user(Incoming_nickname, Incoming_username, Incoming_Email, Incoming_password, Incoming_status) {
+
+
 
     }
 }
