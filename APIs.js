@@ -74,7 +74,7 @@ app_api.get("/APIs", (req, res) => {
             DB.recive_data_user(_id, Name_App);
         } break;
         case "RRP": {
-            DB.recive_ranking_posion(_id, leader_board_name).then(Rank => {
+            DB.Recive_ranking_posion(_id, leader_board_name).then(Rank => {
 
                 res.send(Rank.toString());
                 res.end();
@@ -272,17 +272,6 @@ class DB_model {
     }
 
 
-    async recive_ranking_posion(Incomin_id, Incomin_leader_board_name) {
-
-        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
-        this.Raw_model_leader_board = await connection.db("Chilligames").collection(Incomin_leader_board_name).findOne({ 'ID': Incomin_id });
-        var pos = await connection.db("Chilligames").collection(Incomin_leader_board_name).find({ "Score": { $gt: this.Raw_model_leader_board.Score } }, { sort: { "Score": -1 } }).toArray();
-        connection.close();
-        return pos.length;
-
-    }
-
-
     async Update_User_Info(Incoming_id, Incoming_nickname = String(), Incoming_username = String(), Incoming_Email = String(), Incoming_password = String(), Incoming_status = String()) {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var _id = new mongo_raw.ObjectId(Incoming_id);
@@ -328,5 +317,30 @@ class DB_model {
 
         connection.close();
     }
+
+
+    async Recive_ranking_posion(Incomin_id, Incomin_leader_board_name) {
+
+        var postion;
+
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        this.Raw_model_leader_board = await connection.db("Chilligames").collection(Incomin_leader_board_name).findOne({ 'ID': Incomin_id });
+
+        if (this.Raw_model_leader_board != null) {
+        postion= await connection.db("Chilligames").collection(Incomin_leader_board_name).find({ "Score": { $gt: this.Raw_model_leader_board.Score } }, { sort: { "Score": -1 } }).toArray();
+
+        return postion.length;
+        } else {
+
+            postion = "N/A";
+            return postion;
+        }
+
+        connection.close();
+      
+    }
+
+ 
+
 
 }
