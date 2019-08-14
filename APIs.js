@@ -327,20 +327,20 @@ class DB_model {
         this.Raw_model_leader_board = await connection.db("Chilligames").collection(Incomin_leader_board_name).findOne({ 'ID': Incomin_id });
 
         if (this.Raw_model_leader_board != null) {
-        postion= await connection.db("Chilligames").collection(Incomin_leader_board_name).find({ "Score": { $gt: this.Raw_model_leader_board.Score } }, { sort: { "Score": -1 } }).toArray();
+            postion = await connection.db("Chilligames").collection(Incomin_leader_board_name).find({ "Score": { $gt: this.Raw_model_leader_board.Score } }, { sort: { "Score": -1 } }).toArray();
 
-        return postion.length;
+            connection.close();
+            return postion.length;
         } else {
 
             postion = "N/A";
+            connection.close()
             return postion;
         }
 
-        connection.close();
-      
     }
 
- 
+
 
 
 }
