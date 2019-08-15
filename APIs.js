@@ -44,7 +44,12 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "RLB": {
 
-            DB.Recive_leader_board(leader_board_name, leader_board_count).then(() => { });
+            DB.Recive_leader_board(leader_board_name, leader_board_count).then((result) => {
+
+                res.send(result);
+                res.end();
+
+            });
         } break;
         case "SLBNBY": {
 
@@ -200,11 +205,12 @@ class DB_model {
     }
 
 
-    async Recive_leader_board(incoming_name_leader_board, incoming_count = Number()) {
+    async Recive_leader_board(incoming_name_leader_board, incoming_count) {
 
         var count = Number(incoming_count);
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var result_search = await Connection.db("Chilligames").collection(incoming_name_leader_board).find({}, { limit: count, sort: { 'Score': -1 } }).toArray();
+        Connection.close();
         return result_search;
     }
 
