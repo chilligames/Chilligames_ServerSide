@@ -62,7 +62,11 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "RIOU": {
 
-            DB.Recive_Info_other_user(_id);
+            DB.Recive_Info_other_user(_id).then((result) => {
+                res.send(result);
+                res.end();  
+            });
+
         } break;
         case "RIU": {
             DB.Recive_info_user(_id);
@@ -346,8 +350,6 @@ class DB_model {
         }
 
     }
-
-
 
 
 }
