@@ -240,6 +240,7 @@ class DB_model {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var _id = new mongo_raw.ObjectId(Incomin_id);
         var search_user = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+        Connection.close();
         return search_user;
     }
 
