@@ -114,6 +114,16 @@ app_api.get("/APIs", (req, res) => {
 
             });
         } break;
+        case "CFR": {
+            DB.Cancel_friend_requst(_id, _id_other_player).then(() => {
+                res.end();
+            });
+
+        }
+        case "SMTU": {
+            DB.Send_messege_to_p
+
+        }
     }
 
 
@@ -398,11 +408,24 @@ class DB_model {
 
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { "Friends": this.Raw_Model_User.Friends } });
         console.log("send notifaction to other player for alarm send req");
-
-
         Connection.close();
-
     }
 
+
+    async Cancel_friend_requst(Incoming_id, Incoming_id_other_player) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var _id = new mongo_raw.ObjectID(Incoming_id);
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+        delete this.Raw_Model_User.Friends[Incoming_id_other_player];
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Friends': this.Raw_Model_User.Friends } });
+
+        Connection.close();
+    }
+
+
+    async Send_messege_to_users() {
+
+    }
 
 }
