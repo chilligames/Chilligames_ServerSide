@@ -386,6 +386,7 @@ class DB_model {
 
     }
 
+
     async Send_friend_requst(Incoming_id, Incoming_id_other_player) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
@@ -396,7 +397,9 @@ class DB_model {
         this.Raw_Model_User.Friends[Incoming_id_other_player] = { 'Status': 1 };
 
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { "Friends": this.Raw_Model_User.Friends } });
-        console.log(this.Raw_Model_User.Friends);
+        console.log("send notifaction to other player for alarm send req");
+
+
         Connection.close();
 
     }
