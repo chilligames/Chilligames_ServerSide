@@ -1,6 +1,7 @@
 ﻿var Express = require('express');
 var app_api = Express();
 
+
 app_api.get("/APIs", (req, res) => {
     var DB = new DB_model();
     var pipe_line = req.header("Pipe_line");
@@ -100,9 +101,17 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "CSF": {
             DB.Cheack_status_friend(_id, _id_other_player).then((result) => {
-
-                res.send(result);
+                var Change_value = String(result);
+                res.send(Change_value);
                 res.end();
+            });
+        } break;
+        case "SFR": {
+
+            DB.Send_friend_requst(_id, _id_other_player).then(() => {
+
+                res.end();
+
             });
         } break;
     }
@@ -374,6 +383,21 @@ class DB_model {
             Connection.close();
             return this.Raw_Model_User.Friends[Incoming_id_other_player].Status;
         }
+
+    }
+
+    async Send_friend_requst(Incoming_id, Incoming_id_other_player) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+
+        var _id = new mongo_raw.ObjectId(Incoming_id);
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+
+        this.Raw_Model_User.Friends[Incoming_id_other_player] = { 'Status': 1 };
+
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { "Friends": this.Raw_Model_User.Friends } });
+        console.log(this.Raw_Model_User.Friends);
+        Connection.close();
 
     }
 
