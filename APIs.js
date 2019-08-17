@@ -5,6 +5,7 @@ app_api.get("/APIs", (req, res) => {
     var DB = new DB_model();
     var pipe_line = req.header("Pipe_line");
     var _id = req.header("_id");
+    var _id_other_player = req.header("_id_other_player");
     var leader_board_name = req.header("Leader_board");
     var leader_board_count = req.header("Leader_board_count")
     var Score = req.header("Score");
@@ -64,7 +65,7 @@ app_api.get("/APIs", (req, res) => {
 
             DB.Recive_Info_other_user(_id).then((result) => {
                 res.send(result);
-                res.end();  
+                res.end();
             });
 
         } break;
@@ -97,6 +98,13 @@ app_api.get("/APIs", (req, res) => {
 
             });
         } break;
+        case "CSF": {
+            DB.Cheack_status_friend(_id, _id_other_player).then((result) => {
+
+                res.send(result);
+                res.end();
+            });
+        } break;
     }
 
 
@@ -123,7 +131,7 @@ class DB_model {
             'Status': ''
         },
         "Ban": [],
-        "Friends": [],
+        "Friends": {},
         "Avatar": '',
         "Log": [],
         "Files": [],
@@ -347,6 +355,24 @@ class DB_model {
             postion = "N/A";
             connection.close()
             return postion;
+        }
+
+    }
+
+
+    async Cheack_status_friend(Incoming_id_player, Incoming_id_other_player) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+
+        var _id = new mongo_raw.ObjectId(Incoming_id_player);
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+
+        if (this.Raw_Model_User.Friends[Incoming_id_other_player] == undefined) {
+            Connection.close();
+            return 0;
+
+        } else {
+            Connection.close();
+            return this.Raw_Model_User.Friends[Incoming_id_other_player].Status;
         }
 
     }
