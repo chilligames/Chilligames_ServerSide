@@ -120,8 +120,8 @@ app_api.get("/APIs", (req, res) => {
             });
 
         }
-        case "SMTU": {
-            DB.Send_messege_to_p
+        case "SMTP": {
+            DB.Send_messege_to_users();
 
         }
     }
