@@ -17,6 +17,7 @@ app_api.get("/APIs", (req, res) => {
     var Email = req.header("Email");
     var Password = req.header("Password");
     var Status = req.header("Status");
+    var Message = req.header("Message");
     switch (pipe_line) {
         case "QR": {
 
@@ -120,8 +121,13 @@ app_api.get("/APIs", (req, res) => {
             });
 
         }
-        case "SMTP": {
-            DB.Send_messege_to_users();
+        case "SMTU": {
+
+            DB.Send_messege_to_users(_id, _id_other_player, Message).then(() => {
+
+
+
+            });
 
         }
     }
@@ -150,13 +156,19 @@ class DB_model {
             'Status': ''
         },
         "Ban": [],
-        "Friends": {},
+        "Friends": [],
         "Avatar": '',
         "Log": [],
         "Files": [],
         "Data": {},
         "Inventory": [],
-        "Notifactions": [],
+        "Notifactions": {
+            'Message': {
+                'Recive': [],
+                'send': []
+            },
+            'Notifaction': {}
+        },
         "Teams": [],
         "Wallet": {
             "Coin": "",
@@ -172,7 +184,17 @@ class DB_model {
         'Nick_name': '',
         'Score': 0
     }
+    Raw_model_Friedn = {
+        'ID': '',
+        'Status': ''
+    }
 
+    Raw_model_message = {
+        'ID': '',
+        'Message_body': '',
+        'Date': '',
+        'Status': 0
+    }
 
     async Quick_register() {
 
@@ -385,15 +407,22 @@ class DB_model {
         var _id = new mongo_raw.ObjectId(Incoming_id_player);
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
 
-        if (this.Raw_Model_User.Friends[Incoming_id_other_player] == undefined) {
-            Connection.close();
-            return 0;
+        var result;
 
-        } else {
-            Connection.close();
-            return this.Raw_Model_User.Friends[Incoming_id_other_player].Status;
+        await this.Raw_Model_User.Friends.find((fild) => {
+
+            if (fild.ID == Incoming_id_other_player) {
+                result = fild.Status;
+            }
+
+        });
+
+        if (result==undefined) {
+            result = 0;
         }
 
+
+        return result;
     }
 
 
@@ -402,6 +431,7 @@ class DB_model {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
 
         var _id = new mongo_raw.ObjectId(Incoming_id);
+
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
 
         this.Raw_Model_User.Friends[Incoming_id_other_player] = { 'Status': 1 };
@@ -424,7 +454,27 @@ class DB_model {
     }
 
 
-    async Send_messege_to_users() {
+    async Send_messege_to_users(Incoming_id, Incoming_id_other_player, _incoming_message_body) {
+
+        var other_player = this.Raw_Model_User;
+
+        this.Raw_model_message.ID = Incoming_id;
+        this.Raw_model_message.Message_body = _incoming_message_body;
+        this.Raw_model_message.Date = new Date().toUTCString();
+        this.Raw_model_message.Status = 0;
+
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+
+        var _id_other_player = new mongo_raw.ObjectId(Incoming_id_other_player);
+
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id_other_player }, { $push: { 'Notifactions.Message.Recive': this.Raw_model_message } });
+
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': Incoming_id }, { $push: { 'notifactions.Message.Send': this.Raw_model_message } });
+
+
+
+        console.log(other_player.Notifactions);
 
     }
 
