@@ -120,7 +120,7 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
 
-        }
+        } break;
         case "SMTU": {
 
             DB.Send_messege_to_users(_id, _id_other_player, Message).then(() => {
@@ -129,7 +129,7 @@ app_api.get("/APIs", (req, res) => {
 
             });
 
-        }
+        } break;
     }
 
 
@@ -184,7 +184,7 @@ class DB_model {
         'Nick_name': '',
         'Score': 0
     }
-    Raw_model_Friedn = {
+    Raw_model_Friend = {
         'ID': '',
         'Status': ''
     }
@@ -417,10 +417,9 @@ class DB_model {
 
         });
 
-        if (result==undefined) {
+        if (result == undefined) {
             result = 0;
         }
-
 
         return result;
     }
@@ -432,11 +431,11 @@ class DB_model {
 
         var _id = new mongo_raw.ObjectId(Incoming_id);
 
-        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+        this.Raw_model_Friend.ID = Incoming_id_other_player;
+        this.Raw_model_Friend.Status = 1;
 
-        this.Raw_Model_User.Friends[Incoming_id_other_player] = { 'Status': 1 };
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $push: { "Friends": this.Raw_model_Friend } });
 
-        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { "Friends": this.Raw_Model_User.Friends } });
         console.log("send notifaction to other player for alarm send req");
         Connection.close();
     }
@@ -447,8 +446,24 @@ class DB_model {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var _id = new mongo_raw.ObjectID(Incoming_id);
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
-        delete this.Raw_Model_User.Friends[Incoming_id_other_player];
-        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Friends': this.Raw_Model_User.Friends } });
+
+        for (var postion in this.Raw_Model_User.Friends) {
+            if (this.Raw_Model_User.Friends[postion].ID == Incoming_id_other_player) {
+
+                delete this.Raw_Model_User.Friends[postion];
+            }
+
+        }
+        var new_friend=[];
+        for (var pos_fill in this.Raw_Model_User.Friends) {
+
+            if (this.Raw_Model_User.Friends[pos_fill] != null) {
+
+                new_friend.push(this.Raw_Model_User.Friends[pos_fill]);
+            }
+        }
+
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Friends': new_friend } });
 
         Connection.close();
     }
