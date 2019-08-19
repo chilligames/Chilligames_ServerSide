@@ -522,7 +522,7 @@ class DB_model {
                     this.Raw_Model_User.Notifactions.Message.Send[other_users].Message.push(_incoming_message_body);
                     await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Notifactions.Message.Send': this.Raw_Model_User.Notifactions.Message.Send } });
                 }
-
+                 
             }
 
         }
