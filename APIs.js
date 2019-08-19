@@ -471,7 +471,7 @@ class DB_model {
 
     async Send_messege_to_users(Incoming_id, Incoming_id_other_player, _incoming_message_body) {
 
-        var other_player = this.Raw_Model_User;
+        var other_player ;
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
 
@@ -527,6 +527,7 @@ class DB_model {
 
         }
 
+        Connection.close();
 
     }
 
