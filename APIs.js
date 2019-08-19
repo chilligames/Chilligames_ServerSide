@@ -165,7 +165,7 @@ class DB_model {
         "Notifactions": {
             'Message': {
                 'Recive': [],
-                'send': []
+                'Send': []
             },
             'Notifaction': {}
         },
@@ -189,10 +189,10 @@ class DB_model {
         'Status': ''
     }
 
-    Raw_model_message = {
+    Raw_model_messages = {
+        'Message': [],
         'ID': '',
-        'Message_body': '',
-        'Date': '',
+        'Last_Date': '',
         'Status': 0
     }
 
@@ -454,7 +454,7 @@ class DB_model {
             }
 
         }
-        var new_friend=[];
+        var new_friend = [];
         for (var pos_fill in this.Raw_Model_User.Friends) {
 
             if (this.Raw_Model_User.Friends[pos_fill] != null) {
@@ -473,23 +473,60 @@ class DB_model {
 
         var other_player = this.Raw_Model_User;
 
-        this.Raw_model_message.ID = Incoming_id;
-        this.Raw_model_message.Message_body = _incoming_message_body;
-        this.Raw_model_message.Date = new Date().toUTCString();
-        this.Raw_model_message.Status = 0;
-
-
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
 
         var _id_other_player = new mongo_raw.ObjectId(Incoming_id_other_player);
+        var _id = new mongo_raw.ObjectId(Incoming_id);
 
-        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id_other_player }, { $push: { 'Notifactions.Message.Recive': this.Raw_model_message } });
+        this.Raw_model_messages.ID = Incoming_id;
+        this.Raw_model_messages.Last_Date = new Date().toUTCString();
+        this.Raw_model_messages.Message.push(_incoming_message_body);
+        this.Raw_model_messages.Status = 0;
 
-        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': Incoming_id }, { $push: { 'notifactions.Message.Send': this.Raw_model_message } });
 
+        other_player = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id_other_player });
 
+        if (other_player.Notifactions.Message.Recive.length == 0) {
+            await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id_other_player }, { $push: { 'Notifactions.Message.Recive': this.Raw_model_messages } });
 
-        console.log(other_player.Notifactions);
+        } else {
+
+            for (var Users = Number(); Users < other_player.Notifactions.Message.Recive.length; Users++) {
+
+                if (other_player.Notifactions.Message.Recive[Users].ID == Incoming_id) {
+
+                    other_player.Notifactions.Message.Recive[Users].Message.push(_incoming_message_body);
+                    await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id_other_player }, { $set: { 'Notifactions.Message.Recive': other_player.Notifactions.Message.Recive } });
+                }
+                else {
+                    console.log("creat message");
+                }
+
+            }
+        }
+
+        this.Raw_model_messages.ID = Incoming_id_other_player;
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+
+        if (this.Raw_Model_User.Notifactions.Message.Send.length == 0) {
+
+            await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $push: { 'Notifactions.Message.Send': this.Raw_model_messages } });
+        }
+        else {
+
+            for (var other_users = Number(); other_users < this.Raw_Model_User.Notifactions.Message.Send.length; other_users++) {
+
+                if (this.Raw_Model_User.Notifactions.Message.Send[other_users].ID == Incoming_id_other_player) {
+
+                    this.Raw_Model_User.Notifactions.Message.Send[other_users].Message.push(_incoming_message_body);
+                    console.log(this.Raw_Model_User.Notifactions.Message.Send);
+                    await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Notifactions.Message.Send': this.Raw_Model_User.Notifactions.Message.Send } });
+                }
+
+            }
+
+        }
+
 
     }
 
