@@ -66,6 +66,7 @@ app_api.get("/APIs", (req, res) => {
         case "RIOU": {
 
             DB.Recive_Info_other_user(_id).then((result) => {
+                
                 res.send(result);
                 res.end();
             });
@@ -125,7 +126,7 @@ app_api.get("/APIs", (req, res) => {
 
             DB.Send_messege_to_users(_id, _id_other_player, Message).then(() => {
 
-
+                res.end();
 
             });
 
@@ -519,7 +520,6 @@ class DB_model {
                 if (this.Raw_Model_User.Notifactions.Message.Send[other_users].ID == Incoming_id_other_player) {
 
                     this.Raw_Model_User.Notifactions.Message.Send[other_users].Message.push(_incoming_message_body);
-                    console.log(this.Raw_Model_User.Notifactions.Message.Send);
                     await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Notifactions.Message.Send': this.Raw_Model_User.Notifactions.Message.Send } });
                 }
 
