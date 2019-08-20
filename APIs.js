@@ -18,6 +18,9 @@ app_api.get("/APIs", (req, res) => {
     var Password = req.header("Password");
     var Status = req.header("Status");
     var Message = req.header("Message");
+    var Name_server = req.header("Name_server");
+    var Setting_server = req.header("Setting_Server");
+
     switch (pipe_line) {
         case "QR": {
 
@@ -66,7 +69,7 @@ app_api.get("/APIs", (req, res) => {
         case "RIOU": {
 
             DB.Recive_Info_other_user(_id).then((result) => {
-                
+
                 res.send(result);
                 res.end();
             });
@@ -131,16 +134,16 @@ app_api.get("/APIs", (req, res) => {
             });
 
         } break;
+        case "CS": {
+            DB.Creat_server(_id, Name_server, Setting_server).then(() => {
+                res.end();
+            });
+        } break;
     }
-
-
 }).listen("3333", "127.0.0.1")
 
 
 //database
-
-
-
 var mongo_raw = require('mongodb');
 var Mongo_string = "mongodb://localhost:27017/admin";
 
@@ -196,6 +199,12 @@ class DB_model {
         'Last_Date': '',
         'Status': 0
     }
+
+    Raw_model_server = {
+        'Setting': {},
+        'ID': {}
+    }
+
 
     async Quick_register() {
 
@@ -472,7 +481,7 @@ class DB_model {
 
     async Send_messege_to_users(Incoming_id, Incoming_id_other_player, _incoming_message_body) {
 
-        var other_player ;
+        var other_player;
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
 
@@ -522,7 +531,7 @@ class DB_model {
                     this.Raw_Model_User.Notifactions.Message.Send[other_users].Message.push(_incoming_message_body);
                     await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Notifactions.Message.Send': this.Raw_Model_User.Notifactions.Message.Send } });
                 }
-                 
+
             }
 
         }
@@ -530,5 +539,17 @@ class DB_model {
         Connection.close();
 
     }
+
+
+    async Creat_server(Incoming_id, Incoming_name_server, Incoming_Setting_server) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Parse_to_json = JSON.parse(Incoming_Setting_server);
+        this.Raw_model_server.ID = Incoming_id;
+        this.Raw_model_server.Setting = Parse_to_json;
+
+        await Connection.db("Chilligames_Servers").collection(Incoming_name_server).insertOne(this.Raw_model_server);
+        Connection.close();
+    }
+
 
 }
