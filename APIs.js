@@ -143,8 +143,10 @@ app_api.get("/APIs", (req, res) => {
 
             DB.Rrecive_Servers_Player(_id, Name_server).then(() => {
 
+                res.end();
+
             });
-        }
+        } break;
 
     }
 }).listen("3333", "127.0.0.1")
