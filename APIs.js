@@ -139,6 +139,7 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+      
     }
 }).listen("3333", "127.0.0.1")
 
@@ -549,6 +550,12 @@ class DB_model {
 
         await Connection.db("Chilligames_Servers").collection(Incoming_name_server).insertOne(this.Raw_model_server);
         Connection.close();
+    }
+
+
+    async recive_servers_data(Incomin_name_server) {
+
+        //coming soon
     }
 
 
