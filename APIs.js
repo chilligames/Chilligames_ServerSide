@@ -139,7 +139,13 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
-      
+        case "RSP": {
+
+            DB.Rrecive_Servers_Player(_id, Name_server).then(() => {
+
+            });
+        }
+
     }
 }).listen("3333", "127.0.0.1")
 
@@ -553,9 +559,12 @@ class DB_model {
     }
 
 
-    async recive_servers_data(Incomin_name_server) {
+    async Rrecive_Servers_Player(Incomin_id, Incomin_name_server) {
 
-        //coming soon
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+
+        var search = await Connection.db("Chilligames_Servers").collection(Incomin_name_server).find({ 'ID': Incomin_id }, { sort: { "Setting.Player": -1 } }).toArray();
+        Connection.close();
     }
 
 
