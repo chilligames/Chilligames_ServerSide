@@ -139,12 +139,10 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
-        case "RSP": {
-
-            DB.Rrecive_Servers_Player(_id, Name_server).then(() => {
-
+        case "RSDU": {
+            DB.Rrecive_Data_Servers_User(_id, Name_server).then((result) => {
+                res.send(result);
                 res.end();
-
             });
         } break;
 
@@ -292,9 +290,7 @@ class DB_model {
         var _id = new mongo_raw.ObjectId(incoming_id);
         this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
         var Score_player = Number(this.Raw_Model_User.Leader_board[Incoming_leader_board_name]);
-        console.log(Score_player);
         var result_recive_leader_board = await connection.db("Chilligames").collection(Incoming_leader_board_name).find({ 'Score': { $lt: Score_player } }, { limit: 5 }).toArray();
-        console.log(result_recive_leader_board);
 
     }
 
@@ -303,7 +299,6 @@ class DB_model {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var _id = new mongo_raw.ObjectID(Incomin_id);
         this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
-        console.log(this.Raw_Model_User.Leader_board[Incomin_leader_board_name]);
         return this.Raw_Model_User.Leader_board[Incomin_leader_board_name];
     }
 
@@ -343,8 +338,6 @@ class DB_model {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var _id = new mongo_raw.ObjectId(Incoming_id);
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
-
-        console.log(this.Raw_Model_User.Data[Incoming_name_app]);
 
         return this.Raw_Model_User.Data[Incoming_name_app];
 
@@ -561,12 +554,14 @@ class DB_model {
     }
 
 
-    async Rrecive_Servers_Player(Incomin_id, Incomin_name_server) {
+    async Rrecive_Data_Servers_User(Incomin_id, Incomin_name_server) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
 
         var search = await Connection.db("Chilligames_Servers").collection(Incomin_name_server).find({ 'ID': Incomin_id }, { sort: { "Setting.Player": -1 } }).toArray();
         Connection.close();
+        return search;
+
     }
 
 
