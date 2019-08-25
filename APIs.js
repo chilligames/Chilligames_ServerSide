@@ -20,6 +20,7 @@ app_api.get("/APIs", (req, res) => {
     var Message = req.header("Message");
     var Name_server = req.header("Name_server");
     var Setting_server = req.header("Setting_Server");
+    var _id_server = req.header("_id_Server");
 
     switch (pipe_line) {
         case "QR": {
@@ -145,6 +146,12 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "EC": {
+            DB.Exit_Server(_id, _id_server, Name_server).then(() => {
+
+
+            });
+        }
 
     }
 }).listen("3333", "127.0.0.1")
@@ -556,6 +563,7 @@ class DB_model {
         Connection.close();
     }
 
+    //change
 
     async Rrecive_Data_Servers_User(Incomin_id, Incomin_name_server) {
 
@@ -567,6 +575,14 @@ class DB_model {
 
     }
 
+    async Exit_Server(IncomingID, Incoming_id_server, Incoming_name_server) {
+
+        var _id = new mongo_raw.ObjectId(IncomingID);
+        var _id_server = new mongo_raw.ObjectId(Incoming_id_server);
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $pullAll: { 'Servers': [_id_server] } });
+        Connection.close();
+    }
 
 
 }
