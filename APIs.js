@@ -544,12 +544,15 @@ class DB_model {
 
 
     async Creat_server(Incoming_id, Incoming_name_server, Incoming_Setting_server) {
+        var _id = new mongo_raw.ObjectId(Incoming_id);
+
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var Parse_to_json = JSON.parse(Incoming_Setting_server);
         this.Raw_model_server.ID = Incoming_id;
         this.Raw_model_server.Setting = Parse_to_json;
 
-        await Connection.db("Chilligames_Servers").collection(Incoming_name_server).insertOne(this.Raw_model_server);
+        var Result_insert = await Connection.db("Chilligames_Servers").collection(Incoming_name_server).insertOne(this.Raw_model_server);
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $push: { 'Servers': Result_insert.insertedId } });
         Connection.close();
     }
 
@@ -563,6 +566,7 @@ class DB_model {
         return search;
 
     }
+
 
 
 }
