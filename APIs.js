@@ -163,6 +163,12 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "CSIP": {
+            DB.Cheack_server_in_profile(_id, Name_App, _id_server).then(() => {
+
+                res.end();
+            });
+        }
     }
 }).listen("3333", "127.0.0.1")
 
@@ -641,5 +647,18 @@ class DB_model {
         return result;
     }
 
+
+    async Cheack_server_in_profile(Incoming_ID, Incoming_name_app, Incoming_id_server) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var _id = new mongo_raw.ObjectId(Incoming_ID);
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+
+        for (var i = 0; i < this.Raw_Model_User.Servers[Incoming_name_app].length; i++) {
+
+            if (this.Raw_Model_User.Servers[Incoming_name_app][i] == Incoming_id_server) {
+                console.log("find");
+            }
+        }
+    }
 
 }
