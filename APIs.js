@@ -20,6 +20,7 @@ app_api.get("/APIs", (req, res) => {
     var Message = req.header("Message");
     var Setting_server = req.header("Setting_Server");
     var _id_server = req.header("_id_Server");
+    var Count_server = req.header("Count_servers");
 
     switch (pipe_line) {
         case "QR": {
@@ -156,7 +157,12 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
-
+        case "RAS": {
+            DB.Recive_all_Servers(Name_App, Count_server).then((result) => {
+                res.send(result);
+                res.end();
+            });
+        } break;
     }
 }).listen("3333", "127.0.0.1")
 
@@ -624,6 +630,15 @@ class DB_model {
         Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Servers': this.Raw_Model_User.Servers } });
 
         Connection.close();
+    }
+
+
+    async Recive_all_Servers(Incoming_name_app, Incoming_count_server) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var result = await Connection.db("Chilligames_Servers").collection(Incoming_name_app).find({}, { limit: Number(Incoming_count_server) }).toArray();
+        Connection.close();
+        return result;
     }
 
 
