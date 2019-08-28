@@ -698,7 +698,7 @@ class DB_model {
         var _id = new mongo_raw.ObjectId(Incoming_ID);
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
-        var result;
+        var result=0;
 
         for (var _id_profile of this.Raw_Model_User.Servers[Incoming_name_app]) {
 
@@ -708,12 +708,11 @@ class DB_model {
             }
         }
 
-        if (result == undefined) {
+        if (result == 0) {
             Connection.close();
 
             return 0;
         }
-
 
     }
 
