@@ -170,7 +170,14 @@ app_api.get("/APIs", (req, res) => {
                 res.send(result.toString());
                 res.end();
             });
+        } break;
+        case "ETS": {
+
+            DB.Enter_To_Server(_id, Name_App, _id_server).then(() => {
+                res.end();
+            });
         }
+
     }
 }).listen("3333", "127.0.0.1")
 
@@ -672,6 +679,18 @@ class DB_model {
         return result;
     }
 
+
+    async Enter_To_Server(Incomng_ID, Incoming_name_app, Incoming_id_server) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var _id = new mongo_raw.ObjectID(Incomng_ID);
+
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+        this.Raw_Model_User.Servers[Incoming_name_app].push(Incoming_id_server);
+
+        await Connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { 'Servers': this.Raw_Model_User.Servers } });
+        Connection.close();
+    }
 
 
 }
