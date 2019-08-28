@@ -385,8 +385,8 @@ class DB_model {
         var _id = new mongo_raw.ObjectId(Incoming_id);
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
 
-        return this.Raw_Model_User.Data[Incoming_name_app];
         Connection.close();
+        return this.Raw_Model_User.Data[Incoming_name_app];
     }
 
 
