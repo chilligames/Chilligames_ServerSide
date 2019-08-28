@@ -185,6 +185,11 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "SMTC": {
+            DB.Send_message_to_chatroom(_id, Name_App, Message).then(() => {
+                res.end();
+            });
+        } break;
 
     }
 }).listen("3333", "127.0.0.1")
@@ -253,6 +258,12 @@ class DB_model {
     }
 
 
+    Raw_model_messegae_chatroom = {
+        'ID': '',
+        'Message': '',
+        'Time': '',
+        'Report': 0
+    }
 
     async Quick_register() {
 
@@ -644,6 +655,7 @@ class DB_model {
     async Exit_Server(IncomingID, Incoming_name_app, Incoming_id_server) {
 
         var _id = new mongo_raw.ObjectId(IncomingID);
+
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
@@ -657,12 +669,14 @@ class DB_model {
 
         }
         var server = [];
+
         for (var i = 0; i < this.Raw_Model_User.Servers[Incoming_name_app].length; i++) {
             if (this.Raw_Model_User.Servers[Incoming_name_app][i] != null) {
                 server[i] = this.Raw_Model_User.Servers[Incoming_name_app][i];
             }
         }
         this.Raw_Model_User.Servers[Incoming_name_app] = server;
+
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Servers': this.Raw_Model_User.Servers } });
 
         Connection.close();
@@ -713,6 +727,21 @@ class DB_model {
         this.Raw_Model_User.Servers[Incoming_name_app].push(Incoming_id_server);
 
         await Connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { 'Servers': this.Raw_Model_User.Servers } });
+        Connection.close();
+    }
+
+
+    async Send_message_to_chatroom(Incoming_ID, Incoming_name_app, Incoming_message) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        this.Raw_model_messegae_chatroom.ID = Incoming_ID;
+        this.Raw_model_messegae_chatroom.Message = Incoming_message;
+        this.Raw_model_messegae_chatroom.Report = 0;
+        this.Raw_model_messegae_chatroom.Time = new Date().toUTCString();
+        console.log(this.Raw_model_messegae_chatroom);
+
+        await Connection.db("Chilligames_Chat").collection(Incoming_name_app).insertOne(this.Raw_model_messegae_chatroom);
+        
         Connection.close();
     }
 
