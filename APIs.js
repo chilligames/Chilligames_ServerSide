@@ -175,8 +175,6 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "CSIP": {
             DB.Cheack_server_in_profile(_id, Name_App, _id_server).then((result) => {
-                console.log(result);
-
                 res.send(result.toString());
                 res.end();
             });
@@ -665,7 +663,7 @@ class DB_model {
             }
         }
         this.Raw_Model_User.Servers[Incoming_name_app] = server;
-        Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Servers': this.Raw_Model_User.Servers } });
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Servers': this.Raw_Model_User.Servers } });
 
         Connection.close();
     }
@@ -681,25 +679,28 @@ class DB_model {
 
 
     async Cheack_server_in_profile(Incoming_ID, Incoming_name_app, Incoming_id_server) {
+
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var _id = new mongo_raw.ObjectId(Incoming_ID);
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
         var result;
 
-        for (var i = 0; i < this.Raw_Model_User.Servers[Incoming_name_app].length; i++) {
+        for (var _id_profile of this.Raw_Model_User.Servers[Incoming_name_app]) {
 
-            if (this.Raw_Model_User.Servers[Incoming_name_app][i] == Incoming_id_server) {
-                result = 1;
-            } else {
-                result = 0;
+            if (_id_profile == Incoming_id_server) {
+                Connection.close();
+                return 1;
             }
-
         }
 
-        Connection.close();
+        if (result == undefined) {
+            Connection.close();
 
-        return result;
+            return 0;
+        }
+
+
     }
 
 
