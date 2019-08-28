@@ -334,8 +334,8 @@ class DB_model {
         this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
         var Score_player = Number(this.Raw_Model_User.Leader_board[Incoming_leader_board_name]);
         var result_recive_leader_board = await connection.db("Chilligames").collection(Incoming_leader_board_name).find({ 'Score': { $lt: Score_player } }, { limit: 5 }).toArray();
-        return result_recive_leader_board;
         connection.close();
+        return result_recive_leader_board;
     }
 
 
@@ -343,8 +343,8 @@ class DB_model {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var _id = new mongo_raw.ObjectID(Incomin_id);
         this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
-        return this.Raw_Model_User.Leader_board[Incomin_leader_board_name];
         connection.close();
+        return this.Raw_Model_User.Leader_board[Incomin_leader_board_name];
     }
 
 
@@ -361,8 +361,8 @@ class DB_model {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var _id = new mongo_raw.ObjectId(Incoming_id);
         var result_find_user = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
-        return result_find_user;
         connection.close();
+        return result_find_user;
     }
 
 
@@ -638,8 +638,8 @@ class DB_model {
         var _id_server = new mongo_raw.ObjectId(Incomin_id_server);
 
         var result_search = await connection.db("Chilligames_Servers").collection(Incoming_name_app).findOne({ '_id': _id_server });
-        return result_search;
         connection.close();
+        return result_search;
     }
 
 
