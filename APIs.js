@@ -60,12 +60,17 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "SLBNBY": {
 
-            DB.Recive_leader_board_near_by_user(_id, leader_board_name);
+            DB.Recive_leader_board_near_by_user(_id, leader_board_name).then(() => {
+
+                res.end();
+            });
 
         } break;
         case "RSU": {
 
-            DB.Recive_Score_Player(_id, leader_board_name);
+            DB.Recive_Score_Player(_id, leader_board_name).then(() => {
+                res.end();
+            });
         } break;
         case "RIOU": {
 
@@ -77,7 +82,10 @@ app_api.get("/APIs", (req, res) => {
 
         } break;
         case "RIU": {
-            DB.Recive_info_user(_id);
+            DB.Recive_info_user(_id).then(() => {
+
+                res.end();
+            });
         } break;
         case "SDU": {
 
@@ -88,7 +96,9 @@ app_api.get("/APIs", (req, res) => {
 
         } break;
         case "RDU": {
-            DB.recive_data_user(_id, Name_App);
+            DB.recive_data_user(_id, Name_App).then(() => {
+                res.end();
+            });
         } break;
         case "RRP": {
             DB.Recive_ranking_posion(_id, leader_board_name).then(Rank => {
@@ -176,7 +186,7 @@ app_api.get("/APIs", (req, res) => {
             DB.Enter_To_Server(_id, Name_App, _id_server).then(() => {
                 res.end();
             });
-        }
+        } break;
 
     }
 }).listen("3333", "127.0.0.1")
@@ -325,6 +335,7 @@ class DB_model {
         var Score_player = Number(this.Raw_Model_User.Leader_board[Incoming_leader_board_name]);
         var result_recive_leader_board = await connection.db("Chilligames").collection(Incoming_leader_board_name).find({ 'Score': { $lt: Score_player } }, { limit: 5 }).toArray();
         return result_recive_leader_board;
+        connection.close();
     }
 
 
@@ -333,6 +344,7 @@ class DB_model {
         var _id = new mongo_raw.ObjectID(Incomin_id);
         this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
         return this.Raw_Model_User.Leader_board[Incomin_leader_board_name];
+        connection.close();
     }
 
 
@@ -350,6 +362,7 @@ class DB_model {
         var _id = new mongo_raw.ObjectId(Incoming_id);
         var result_find_user = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
         return result_find_user;
+        connection.close();
     }
 
 
@@ -373,7 +386,7 @@ class DB_model {
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
 
         return this.Raw_Model_User.Data[Incoming_name_app];
-
+        Connection.close();
     }
 
 
@@ -466,6 +479,7 @@ class DB_model {
             result = 0;
         }
 
+        Connection.close();
         return result;
     }
 
@@ -577,6 +591,7 @@ class DB_model {
 
 
     async Creat_server(Incoming_id, Incoming_name_app, Incoming_Setting_server) {
+
         var _id = new mongo_raw.ObjectId(Incoming_id);
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
@@ -588,7 +603,14 @@ class DB_model {
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
 
-        this.Raw_Model_User.Servers[Incoming_name_app].push(Result_insert.insertedId.toHexString());
+
+        if (this.Raw_Model_User.Servers[Incoming_name_app] == undefined) {
+
+            this.Raw_Model_User.Servers[Incoming_name_app] = [];
+            this.Raw_Model_User.Servers[Incoming_name_app].push(Result_insert.insertedId.toHexString());
+        } else {
+            this.Raw_Model_User.Servers[Incoming_name_app].push(Result_insert.insertedId.toHexString());
+        }
 
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Servers': this.Raw_Model_User.Servers } });
 
@@ -617,6 +639,7 @@ class DB_model {
 
         var result_search = await connection.db("Chilligames_Servers").collection(Incoming_name_app).findOne({ '_id': _id_server });
         return result_search;
+        connection.close();
     }
 
 
