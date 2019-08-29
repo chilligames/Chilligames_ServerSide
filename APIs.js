@@ -21,6 +21,7 @@ app_api.get("/APIs", (req, res) => {
     var Setting_server = req.header("Setting_Server");
     var _id_server = req.header("_id_Server");
     var Count_server = req.header("Count_servers");
+    var Count_messages = req.header("Count_messages");
 
     switch (pipe_line) {
         case "QR": {
@@ -190,6 +191,12 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "RCM": {
+            DB.Recive_Chatroom_Messages(Name_App, Count_messages).then((Result) => {
+                res.send(Result);
+                res.end();
+            });
+        }
 
     }
 }).listen("3333", "127.0.0.1")
@@ -698,7 +705,7 @@ class DB_model {
         var _id = new mongo_raw.ObjectId(Incoming_ID);
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
-        var result=0;
+        var result = 0;
 
         for (var _id_profile of this.Raw_Model_User.Servers[Incoming_name_app]) {
 
@@ -737,12 +744,18 @@ class DB_model {
         this.Raw_model_messegae_chatroom.Message = Incoming_message;
         this.Raw_model_messegae_chatroom.Report = 0;
         this.Raw_model_messegae_chatroom.Time = new Date().toUTCString();
-        console.log(this.Raw_model_messegae_chatroom);
-
         await Connection.db("Chilligames_Chat").collection(Incoming_name_app).insertOne(this.Raw_model_messegae_chatroom);
-        
+
         Connection.close();
     }
 
 
+    async Recive_Chatroom_Messages(Incoming_Name_App, Incoming_count_recive) {
+        var Connections = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+
+        var result_find = await Connections.db("Chilligames_Chat").collection(Incoming_Name_App).find({}, { max: Incoming_count_recive }).toArray();
+        Connections.close();
+
+        return result_find;
+    }
 }
