@@ -7,6 +7,7 @@ app_api.get("/APIs", (req, res) => {
     var pipe_line = req.header("Pipe_line");
     var _id = req.header("_id");
     var _id_other_player = req.header("_id_other_player");
+    var _id_message = req.header("_id_message");
     var leader_board_name = req.header("Leader_board");
     var leader_board_count = req.header("Leader_board_count")
     var Score = req.header("Score");
@@ -21,7 +22,6 @@ app_api.get("/APIs", (req, res) => {
     var Setting_server = req.header("Setting_Server");
     var _id_server = req.header("_id_Server");
     var Count_server = req.header("Count_servers");
-    var Count_messages = req.header("Count_messages");
 
     switch (pipe_line) {
         case "QR": {
@@ -192,8 +192,13 @@ app_api.get("/APIs", (req, res) => {
             });
         } break;
         case "RCM": {
-            DB.Recive_Chatroom_Messages(Name_App, Count_messages).then((Result) => {
+            DB.Recive_Chatroom_Messages(Name_App).then((Result) => {
                 res.send(Result);
+                res.end();
+            });
+        } break;
+        case "RM": {
+            DB.Report_message(_id_message, Name_App).then(() => {
                 res.end();
             });
         }
@@ -266,7 +271,9 @@ class DB_model {
 
 
     Raw_model_messegae_chatroom = {
+        'Postion': '',
         'ID': '',
+        'Nick_Name': '',
         'Message': '',
         'Time': '',
         'Report': 0
@@ -740,22 +747,56 @@ class DB_model {
     async Send_message_to_chatroom(Incoming_ID, Incoming_name_app, Incoming_message) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(Incoming_ID) });
+
+        var postion = await Connection.db("Chilligames_Chat").collection(Incoming_name_app).find({}, { sort: { 'Postion': -1 } }).toArray();
+
+
+        this.Raw_model_messegae_chatroom.Postion = postion[0].Postion + 1;
+
         this.Raw_model_messegae_chatroom.ID = Incoming_ID;
+        this.Raw_model_messegae_chatroom.Nick_Name = this.Raw_Model_User.Info.Nickname;
         this.Raw_model_messegae_chatroom.Message = Incoming_message;
         this.Raw_model_messegae_chatroom.Report = 0;
         this.Raw_model_messegae_chatroom.Time = new Date().toUTCString();
+
         await Connection.db("Chilligames_Chat").collection(Incoming_name_app).insertOne(this.Raw_model_messegae_chatroom);
 
         Connection.close();
     }
 
 
-    async Recive_Chatroom_Messages(Incoming_Name_App, Incoming_count_recive) {
+    async Recive_Chatroom_Messages(Incoming_Name_App) {
+
         var Connections = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Count_call_back = await Connections.db("Chilligames_Chat").collection(Incoming_Name_App).countDocuments() - 10;
 
-        var result_find = await Connections.db("Chilligames_Chat").collection(Incoming_Name_App).find({}, { max: Incoming_count_recive }).toArray();
+        var result_find = await Connections.db("Chilligames_Chat").collection(Incoming_Name_App).find({ 'Postion': { $gte: Count_call_back } }, { sort: { 'Postion': 1 } }).toArray();
         Connections.close();
-
         return result_find;
     }
+
+
+    async Report_message(Incoming_message_id, Incoming_name_app, ) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+
+
+
+        this.Raw_model_messegae_chatroom = await Connection.db("Chilligames_Chat").collection(Incoming_name_app).findOne({ '_id': new mongo_raw.ObjectId(Incoming_message_id) });
+
+
+        if (this.Raw_model_messegae_chatroom.Report + 1 > 3) {
+
+            await Connection.db("Chilligames_Chat").collection(Incoming_name_app).deleteOne({ '_id': new mongo_raw.ObjectId(Incoming_message_id) });
+        } else {
+            this.Raw_model_messegae_chatroom.Report = this.Raw_model_messegae_chatroom.Report + 1;
+
+            await Connection.db("Chilligames_Chat").collection(Incoming_name_app).updateOne({ '_id': new mongo_raw.ObjectId(Incoming_message_id) }, { $set: { 'Report': this.Raw_model_messegae_chatroom.Report } });
+        }
+
+        Connection.close();
+
+    }
+
 }
