@@ -6,6 +6,7 @@ app_api.get("/APIs", (req, res) => {
     var DB = new DB_model();
     var pipe_line = req.header("Pipe_line");
     var _id = req.header("_id");
+    var _id_server = req.header("_id_Server");
     var _id_other_player = req.header("_id_other_player");
     var _id_message = req.header("_id_message");
     var leader_board_name = req.header("Leader_board");
@@ -20,7 +21,6 @@ app_api.get("/APIs", (req, res) => {
     var Status = req.header("Status");
     var Message = req.header("Message");
     var Setting_server = req.header("Setting_Server");
-    var _id_server = req.header("_id_Server");
     var Count_server = req.header("Count_servers");
 
     switch (pipe_line) {
@@ -781,10 +781,7 @@ class DB_model {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
 
-
-
         this.Raw_model_messegae_chatroom = await Connection.db("Chilligames_Chat").collection(Incoming_name_app).findOne({ '_id': new mongo_raw.ObjectId(Incoming_message_id) });
-
 
         if (this.Raw_model_messegae_chatroom.Report + 1 > 3) {
 
