@@ -725,6 +725,7 @@ class DB_model {
         return result_find;
     }
 
+
     async Report_message(Incoming_message_id, Incoming_name_app, ) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
@@ -743,6 +744,7 @@ class DB_model {
         Connection.close();
 
     }
+
 
     async Send_messege_to_users(Incoming_id, Incoming_id_other_player, _incoming_message_body) {
 
@@ -836,6 +838,7 @@ class DB_model {
         Connection.close();
     }
 
+
     async Recive_Messeges_User(Incoming_id) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
@@ -859,7 +862,7 @@ class DB_model {
             }
 
         }
-        
+
         console.log(result);
 
         Connection.close();
