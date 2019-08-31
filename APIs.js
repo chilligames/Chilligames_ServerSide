@@ -555,7 +555,7 @@ class DB_model {
         this.Raw_model_messages.Last_Date = new Date().toUTCString();
         this.Raw_model_messages.Status = 0;
 
-        var other_player = this.Raw_Model_User;
+        var other_player ;
 
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
