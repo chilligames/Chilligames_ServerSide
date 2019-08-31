@@ -201,7 +201,14 @@ app_api.get("/APIs", (req, res) => {
             DB.Report_message(_id_message, Name_App).then(() => {
                 res.end();
             });
-        }
+        } break;
+        case "RMU": {
+            DB.Recive_Messeges_User(_id).then((result) => {
+                res.send(result);
+                res.end();
+            });
+
+        } break;
 
     }
 }).listen("3333", "127.0.0.1")
@@ -548,99 +555,6 @@ class DB_model {
     }
 
 
-    async Send_messege_to_users(Incoming_id, Incoming_id_other_player, _incoming_message_body) {
-
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
-        this.Raw_model_messages.ID = Incoming_id_other_player;
-        this.Raw_model_messages.Last_Date = new Date().toUTCString();
-        this.Raw_model_messages.Status = 0;
-
-        var other_player ;
-
-
-        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
-
-        if (this.Raw_Model_User.Notifactions.Message.length >= 1) {
-
-            let status = 0;
-
-            for (var i = 0; i < this.Raw_Model_User.Notifactions.Message.length; i++) {
-
-                if (this.Raw_Model_User.Notifactions.Message[i].ID == Incoming_id_other_player) {
-
-                    this.Raw_Model_User.Notifactions.Message[i].Message.push(_incoming_message_body);
-                    this.Raw_Model_User.Notifactions.Message[i].Last_Date = new Date().toUTCString();
-                    this.Raw_Model_User.Notifactions.Message[i].Status = 0;
-
-                    await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { 'Notifactions.Message': this.Raw_Model_User.Notifactions.Message } });
-                    status = 1;
-                    break;
-                } else {
-                    status = 0
-                }
-            }
-
-            if (status != 1) {
-
-                this.Raw_model_messages.Message.push(_incoming_message_body);
-                await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $push: { 'Notifactions.Message': this.Raw_model_messages } });
-            }
-
-
-        } else {
-
-            this.Raw_model_messages.Message.push(_incoming_message_body);
-            await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $push: { 'Notifactions.Message': this.Raw_model_messages } });
-        }
-
-
-
-        other_player = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) });
-
-        let status = 0;
-
-        this.Raw_model_messages.ID = Incoming_id;
-        this.Raw_model_messages.Last_Date = new Date().toUTCString();
-        this.Raw_model_messages.Status = 0;
-
-        if (other_player.Notifactions.Message.length >= 1) {
-
-
-            for (var i = 0; i < other_player.Notifactions.Message.length; i++) {
-
-                if (other_player.Notifactions.Message[i].ID == Incoming_id) {
-
-                    other_player.Notifactions.Message[i].Message.push(_incoming_message_body);
-                    other_player.Notifactions.Message[i].Last_Date = new Date().toUTCString();
-                    other_player.Notifactions.Message[i].Status = 0;
-
-                    await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $set: { 'Notifactions.Message': other_player.Notifactions.Message } })
-                    status = 1;
-                    break;
-
-                } else {
-                    status = 0;
-                }
-            }
-
-
-            if (status != 1) {
-
-                console.log("not fide");
-                await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $push: { 'Notifactions.Message': this.Raw_model_messages } });
-            }
-
-
-        } else {
-
-            this.Raw_model_messages.Message.push(_incoming_message_body);
-            await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $push: { 'Notifactions.Message': this.Raw_model_messages } });
-        }
-
-        Connection.close();
-    }
-
-
     async Creat_server(Incoming_id, Incoming_name_app, Incoming_Setting_server) {
 
         var _id = new mongo_raw.ObjectId(Incoming_id);
@@ -806,6 +720,99 @@ class DB_model {
     }
 
 
+    async Send_messege_to_users(Incoming_id, Incoming_id_other_player, _incoming_message_body) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        this.Raw_model_messages.ID = Incoming_id_other_player;
+        this.Raw_model_messages.Last_Date = new Date().toUTCString();
+        this.Raw_model_messages.Status = 0;
+
+        var other_player;
+
+
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
+
+        if (this.Raw_Model_User.Notifactions.Message.length >= 1) {
+
+            let status = 0;
+
+            for (var i = 0; i < this.Raw_Model_User.Notifactions.Message.length; i++) {
+
+                if (this.Raw_Model_User.Notifactions.Message[i].ID == Incoming_id_other_player) {
+
+                    this.Raw_Model_User.Notifactions.Message[i].Message.push(_incoming_message_body);
+                    this.Raw_Model_User.Notifactions.Message[i].Last_Date = new Date().toUTCString();
+                    this.Raw_Model_User.Notifactions.Message[i].Status = 0;
+
+                    await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { 'Notifactions.Message': this.Raw_Model_User.Notifactions.Message } });
+                    status = 1;
+                    break;
+                } else {
+                    status = 0
+                }
+            }
+
+            if (status != 1) {
+
+                this.Raw_model_messages.Message.push(_incoming_message_body);
+                await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $push: { 'Notifactions.Message': this.Raw_model_messages } });
+            }
+
+
+        } else {
+
+            this.Raw_model_messages.Message.push(_incoming_message_body);
+            await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $push: { 'Notifactions.Message': this.Raw_model_messages } });
+        }
+
+
+
+        other_player = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) });
+
+        let status = 0;
+
+        this.Raw_model_messages.ID = Incoming_id;
+        this.Raw_model_messages.Last_Date = new Date().toUTCString();
+        this.Raw_model_messages.Status = 0;
+
+        if (other_player.Notifactions.Message.length >= 1) {
+
+
+            for (var i = 0; i < other_player.Notifactions.Message.length; i++) {
+
+                if (other_player.Notifactions.Message[i].ID == Incoming_id) {
+
+                    other_player.Notifactions.Message[i].Message.push(_incoming_message_body);
+                    other_player.Notifactions.Message[i].Last_Date = new Date().toUTCString();
+                    other_player.Notifactions.Message[i].Status = 0;
+
+                    await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $set: { 'Notifactions.Message': other_player.Notifactions.Message } })
+                    status = 1;
+                    break;
+
+                } else {
+                    status = 0;
+                }
+            }
+
+
+            if (status != 1) {
+
+                console.log("not fide");
+                await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $push: { 'Notifactions.Message': this.Raw_model_messages } });
+            }
+
+
+        } else {
+
+            this.Raw_model_messages.Message.push(_incoming_message_body);
+            await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $push: { 'Notifactions.Message': this.Raw_model_messages } });
+        }
+
+        Connection.close();
+    }
+
+
     async Report_message(Incoming_message_id, Incoming_name_app, ) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
@@ -823,6 +830,15 @@ class DB_model {
 
         Connection.close();
 
+    }
+
+
+    async Recive_Messeges_User(Incoming_id) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
+        Connection.close();
+        return this.Raw_Model_User.Notifactions.Message;
     }
 
 }
