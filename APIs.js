@@ -207,7 +207,13 @@ app_api.get("/APIs", (req, res) => {
                 res.send(result);
                 res.end();
             });
+        } break;
+        case "RMEU": {
 
+            DB.Recive_messge_each_user(_id, _id_other_player).then(result => {
+                res.send(result);
+                res.end();
+            });
         } break;
 
     }
@@ -838,8 +844,27 @@ class DB_model {
         return this.Raw_Model_User.Notifactions.Message;
     }
 
-    async Recive_messge_each_user(Incoming_id, Incoming_id_other_uer) {
 
+    async Recive_messge_each_user(Incoming_id, Incoming_id_other_uer) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
+        var result = [];
+
+        for (var i = 0; i < this.Raw_Model_User.Notifactions.Message.length; i++) {
+
+            if (this.Raw_Model_User.Notifactions.Message[i].ID == Incoming_id_other_uer) {
+
+                result = this.Raw_Model_User.Notifactions.Message[i].Message;
+
+            }
+
+        }
+        
+        console.log(result);
+
+        Connection.close();
+
+        return result;
 
     }
 
