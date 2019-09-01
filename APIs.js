@@ -289,6 +289,12 @@ class DB_model {
         'Report': 0
     }
 
+    Raw_model_each_message = {
+        'PM': '',
+        'Time': '',
+        'ID': '',
+    }
+
     async Quick_register() {
 
         var connected = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
@@ -756,6 +762,10 @@ class DB_model {
         var other_player;
 
 
+        this.Raw_model_each_message.ID = Incoming_id;
+        this.Raw_model_each_message.PM = _incoming_message_body;
+        this.Raw_model_each_message.Time = new Date().toUTCString();
+
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
 
         if (this.Raw_Model_User.Notifactions.Message.length >= 1) {
@@ -766,7 +776,8 @@ class DB_model {
 
                 if (this.Raw_Model_User.Notifactions.Message[i].ID == Incoming_id_other_player) {
 
-                    this.Raw_Model_User.Notifactions.Message[i].Message.push(_incoming_message_body);
+
+                    this.Raw_Model_User.Notifactions.Message[i].Message.push(this.Raw_model_each_message);
                     this.Raw_Model_User.Notifactions.Message[i].Last_Date = new Date().toUTCString();
                     this.Raw_Model_User.Notifactions.Message[i].Status = 0;
 
@@ -779,15 +790,15 @@ class DB_model {
             }
 
             if (status != 1) {
-
-                this.Raw_model_messages.Message.push(_incoming_message_body);
+                this.Raw_model_messages.Message.push(this.Raw_model_each_message);
                 await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $push: { 'Notifactions.Message': this.Raw_model_messages } });
             }
 
 
         } else {
 
-            this.Raw_model_messages.Message.push(_incoming_message_body);
+            this.Raw_model_messages.Message.push(this.Raw_model_each_message);
+
             await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $push: { 'Notifactions.Message': this.Raw_model_messages } });
         }
 
@@ -798,8 +809,6 @@ class DB_model {
         let status = 0;
 
         this.Raw_model_messages.ID = Incoming_id;
-        this.Raw_model_messages.Last_Date = new Date().toUTCString();
-        this.Raw_model_messages.Status = 0;
 
         if (other_player.Notifactions.Message.length >= 1) {
 
@@ -808,7 +817,7 @@ class DB_model {
 
                 if (other_player.Notifactions.Message[i].ID == Incoming_id) {
 
-                    other_player.Notifactions.Message[i].Message.push(_incoming_message_body);
+                    other_player.Notifactions.Message[i].Message.push(this.Raw_model_each_message);
                     other_player.Notifactions.Message[i].Last_Date = new Date().toUTCString();
                     other_player.Notifactions.Message[i].Status = 0;
 
@@ -831,7 +840,7 @@ class DB_model {
 
         } else {
 
-            this.Raw_model_messages.Message.push(_incoming_message_body);
+            this.Raw_model_messages.Message.push(this.Raw_model_each_message);
             await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $push: { 'Notifactions.Message': this.Raw_model_messages } });
         }
 
@@ -863,7 +872,6 @@ class DB_model {
 
         }
 
-        console.log(result);
 
         Connection.close();
 
