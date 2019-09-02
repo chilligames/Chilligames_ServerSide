@@ -215,6 +215,14 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "RN": {
+
+            DB.Recive_notifactions(_id, Name_App).then((result) => {
+                res.send(result);
+                res.end();
+            });
+
+        } break;
 
     }
 }).listen("3333", "127.0.0.1")
@@ -294,6 +302,8 @@ class DB_model {
         'Time': '',
         'ID': '',
     }
+
+
 
     async Quick_register() {
 
@@ -878,5 +888,14 @@ class DB_model {
         return result;
 
     }
+
+
+    async Recive_notifactions(Incoming_id, Incoming_name_App) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
+        Connection.close();
+        return this.Raw_Model_User.Notifactions.Notifaction[Incoming_name_App];
+    }
+
 
 }
