@@ -10,7 +10,7 @@ app_api.get("/APIs", (req, res) => {
     var _id_other_player = req.header("_id_other_player");
     var _id_message = req.header("_id_message");
     var leader_board_name = req.header("Leader_board");
-    var leader_board_count = req.header("Leader_board_count")
+    var Count_search = req.header("Count");
     var Score = req.header("Score");
     var Data_user = req.header("Data_user");
     var Name_App = req.header("Name_App");
@@ -21,7 +21,6 @@ app_api.get("/APIs", (req, res) => {
     var Status = req.header("Status");
     var Message = req.header("Message");
     var Setting_server = req.header("Setting_Server");
-    var Count_server = req.header("Count_servers");
 
     switch (pipe_line) {
         case "QR": {
@@ -52,7 +51,7 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "RLB": {
 
-            DB.Recive_leader_board(leader_board_name, leader_board_count).then((result) => {
+            DB.Recive_leader_board(leader_board_name, Count_search).then((result) => {
 
                 res.send(result);
                 res.end();
@@ -169,7 +168,7 @@ app_api.get("/APIs", (req, res) => {
             });
         } break;
         case "RAS": {
-            DB.Recive_all_Servers(Name_App, Count_server).then((result) => {
+            DB.Recive_all_Servers(Name_App, Count_search).then((result) => {
                 res.send(result);
                 res.end();
             });
@@ -230,6 +229,12 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
 
+        } break;
+        case "SU": {
+            DB.Search_User(Nickname, Count_search).then((result) => {
+                res.send(result);
+                res.end();
+            });
         } break;
 
     }
@@ -913,9 +918,17 @@ class DB_model {
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
 
         this.Raw_Model_User.Notifactions.Notifaction[Incoming_name_app] = {};
-        Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { 'Notifactions.Notifaction': this.Raw_Model_User.Notifactions.Notifaction });
+        Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { 'Notifactions.Notifaction': this.Raw_Model_User.Notifactions.Notifaction } });
 
         Connection.close();
+    }
+
+
+    async Search_User(Incoming_Nick_name, count_find) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var finder = await Connection.db("Chilligames").collection("Users").find({}, { projection: { 'Info.Nickname': 1 }, limit: Number(count_find), $text: { $search: Incoming_Nick_name } }).toArray();
+        Connection.close();
+        return finder;
     }
 
 }
