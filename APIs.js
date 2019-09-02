@@ -223,6 +223,14 @@ app_api.get("/APIs", (req, res) => {
             });
 
         } break;
+        case "RNU": {
+
+            DB.Remove_Notifaction_User(_id, Name_App).then(() => {
+
+                res.end();
+            });
+
+        } break;
 
     }
 }).listen("3333", "127.0.0.1")
@@ -897,5 +905,15 @@ class DB_model {
         return this.Raw_Model_User.Notifactions.Notifaction[Incoming_name_App];
     }
 
+
+    async Remove_Notifaction_User(Incoming_id, Incoming_name_app) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
+
+        this.Raw_Model_User.Notifactions.Notifaction[Incoming_name_app] = {};
+        Connection.close();
+    }
 
 }
