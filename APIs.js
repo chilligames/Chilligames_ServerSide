@@ -913,6 +913,8 @@ class DB_model {
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
 
         this.Raw_Model_User.Notifactions.Notifaction[Incoming_name_app] = {};
+        Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { 'Notifactions.Notifaction': this.Raw_Model_User.Notifactions.Notifaction });
+
         Connection.close();
     }
 
