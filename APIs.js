@@ -82,8 +82,8 @@ app_api.get("/APIs", (req, res) => {
 
         } break;
         case "RIU": {
-            DB.Recive_info_user(_id).then(() => {
-
+            DB.Recive_info_user(_id).then((result) => {
+                res.send(result);
                 res.end();
             });
         } break;
@@ -341,8 +341,14 @@ class DB_model {
         var _id = new mongo_raw.ObjectId(Incoming_id);
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var result_search = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
-        Connection.close();
-        return result_search;
+        if (result_search != null) {
+
+            Connection.close();
+            return "1";
+        } else {
+            Connection.close();
+            return "0";
+        }
     }
 
 
@@ -422,9 +428,18 @@ class DB_model {
     async Recive_info_user(Incoming_id) {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var _id = new mongo_raw.ObjectId(Incoming_id);
-        var result_find_user = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+        var Schema_info_user = {
+            'Info': {
+                'Username': '',
+                'Nickname': '',
+                'Status': '',
+                'Email': ''
+            }
+        }
+
+        Schema_info_user = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id }, { projection: { 'Info': 1 } });
         connection.close();
-        return result_find_user;
+        return Schema_info_user.Info;
     }
 
 
@@ -926,7 +941,7 @@ class DB_model {
 
     async Search_User(Incoming_Nick_name, count_find) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
-        var finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Nickname': Incoming_Nick_name }, { projection: { 'Info.Nickname':1}});
+        var finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Nickname': Incoming_Nick_name }, { projection: { 'Info.Nickname': 1 } });
         Connection.close();
         return finder;
     }
