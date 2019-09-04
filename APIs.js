@@ -428,14 +428,7 @@ class DB_model {
     async Recive_info_user(Incoming_id) {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var _id = new mongo_raw.ObjectId(Incoming_id);
-        var Schema_info_user = {
-            'Info': {
-                'Username': '',
-                'Nickname': '',
-                'Status': '',
-                'Email': ''
-            }
-        }
+        var Schema_info_user;
 
         Schema_info_user = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id }, { projection: { 'Info': 1 } });
         connection.close();
@@ -939,7 +932,7 @@ class DB_model {
     }
 
 
-    async Search_User(Incoming_Nick_name, count_find) {
+    async Search_User(Incoming_Nick_name) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Nickname': Incoming_Nick_name }, { projection: { 'Info.Nickname': 1 } });
         Connection.close();
