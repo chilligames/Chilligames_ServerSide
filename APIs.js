@@ -1,6 +1,4 @@
-﻿'use strict';
-
-var Express = require('express');
+﻿var Express = require('express');
 var app_api = Express();
 
 
@@ -38,8 +36,7 @@ app_api.get("/APIs", (req, res) => {
 
             DB.Quick_login(_id).then(result => {
 
-                res.send(result.toString());
-
+                res.send(result);
                 res.end();
 
             });
@@ -47,7 +44,7 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "SSTLB": {
 
-            DB.Send_Score_to_leader_board(_id, Name_App, leader_board_name, Score).then(() => {
+            DB.Send_Score_to_leader_board(_id, leader_board_name, Score).then(() => {
                 res.end();
             });
 
@@ -344,46 +341,42 @@ class DB_model {
         var _id = new mongo_raw.ObjectId(Incoming_id);
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var result_search = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
-
-
-        if (result_search != null) {
-            Connection.close();
-            return 1;
-        } else {
-            Connection.close();
-            return 0;
-
-        }
-
+        Connection.close();
+        return result_search;
     }
 
 
-    async Send_Score_to_leader_board(incoming_id, Incoming_name_app, incoming_leaderboard_name, incoming_Score) {
+    async Send_Score_to_leader_board(incoming_id, incoming_leaderboard_name, incoming_Score = Number()) {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var _id = new mongo_raw.ObjectId(incoming_id);
 
+        this.Raw_model_leader_board = await connection.db("Chilligames").collection(incoming_leaderboard_name).findOne({ 'ID': incoming_id });
+        this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
 
-        this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(incoming_id) });
+        if (this.Raw_model_leader_board == null) {
 
+            var new_leader_board = {
+                'ID': incoming_id,
+                'Nick_name': this.Raw_Model_User.Info.Nickname,
+                'Score': Number(incoming_Score)
+            };
+            await connection.db("Chilligames").collection(incoming_leaderboard_name).insertOne(new_leader_board);
 
-        if (this.Raw_Model_User.Leader_board[Incoming_name_app] == undefined) {
+            this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = Number(incoming_Score);
 
-            this.Raw_Model_User.Leader_board[Incoming_name_app] = {};
-            this.Raw_Model_User.Leader_board[Incoming_name_app][incoming_leaderboard_name] = Number(incoming_Score);
+            await connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { "Leader_board": this.Raw_Model_User.Leader_board } });
+            connection.close();
 
         } else {
+            await connection.db("Chilligames").collection(incoming_leaderboard_name).updateOne({ 'ID': incoming_id }, { $set: { 'Score': Number(incoming_Score) } });
+            this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = Number(incoming_Score);
 
-            try {
-
-                this.Raw_Model_User.Leader_board[Incoming_name_app][incoming_leaderboard_name] = Number(incoming_Score);
-
-            } catch (e) {
-
-            }
+            await connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { 'Leader_board': this.Raw_Model_User.Leader_board } });
+            connection.close();
         }
 
-        await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $set: { 'Leader_board': this.Raw_Model_User.Leader_board } });
 
-        connection.close();
+
     }
 
 
@@ -445,6 +438,7 @@ class DB_model {
         this.Raw_Model_User.Data[Incoming_name_app] = serilize_data;
         await Connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { 'Data': this.Raw_Model_User.Data } });
         Connection.close();
+
     }
 
 
@@ -639,7 +633,6 @@ class DB_model {
     }
 
 
-
     async Recive_data_Server(Incomin_id_server, Incoming_name_app) {
 
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
@@ -690,6 +683,7 @@ class DB_model {
         return result;
     }
 
+
     async Cheack_server_in_profile(Incoming_ID, Incoming_name_app, Incoming_id_server) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
@@ -714,6 +708,7 @@ class DB_model {
 
     }
 
+
     async Enter_To_Server(Incomng_ID, Incoming_name_app, Incoming_id_server) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
@@ -725,6 +720,8 @@ class DB_model {
         await Connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { 'Servers': this.Raw_Model_User.Servers } });
         Connection.close();
     }
+
+
     async Send_message_to_chatroom(Incoming_ID, Incoming_name_app, Incoming_message) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
@@ -746,6 +743,7 @@ class DB_model {
         Connection.close();
     }
 
+
     async Recive_Chatroom_Messages(Incoming_Name_App) {
 
         var Connections = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
@@ -754,9 +752,7 @@ class DB_model {
         var result_find = await Connections.db("Chilligames_Chat").collection(Incoming_Name_App).find({ 'Postion': { $gte: Count_call_back } }, { sort: { 'Postion': 1 } }).toArray();
         Connections.close();
         return result_find;
-
     }
-
 
 
     async Report_message(Incoming_message_id, Incoming_name_app, ) {
@@ -930,7 +926,7 @@ class DB_model {
 
     async Search_User(Incoming_Nick_name, count_find) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
-        var finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Nickname': Incoming_Nick_name }, { projection: { 'Info.Nickname': 1 } });
+        var finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Nickname': Incoming_Nick_name }, { projection: { 'Info.Nickname':1}});
         Connection.close();
         return finder;
     }
