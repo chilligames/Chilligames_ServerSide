@@ -115,6 +115,12 @@ app_api.get("/APIs", (req, res) => {
 
             });
         } break;
+        case "CNN": {
+            DB.Cheack_Nick_name(Nickname).then((result) => {
+                res.send(result);
+                res.end();
+            });
+        } break;
         case "CSF": {
             DB.Cheack_status_friend(_id, _id_other_player).then((result) => {
                 var Change_value = String(result);
@@ -507,6 +513,18 @@ class DB_model {
     }
 
 
+    async Cheack_Nick_name(Incomin_Nickname) {
+        var Connection = new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true });
+        var result_find = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Nickname': Incomin_Nickname });
+        if (result_find != null) {
+            Connection.close();
+            return "1";
+        } else {
+            Connection.close();
+            return "0";
+        }
+    }
+
     async Recive_ranking_posion(Incomin_id, Incomin_leader_board_name) {
 
         var postion;
@@ -596,6 +614,8 @@ class DB_model {
 
         Connection.close();
     }
+
+
 
 
     async Creat_server(Incoming_id, Incoming_name_app, Incoming_Setting_server) {
