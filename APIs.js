@@ -121,6 +121,12 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "CUN": {
+            DB.Cheack_User_name(Username).then(result => {
+                res.send(result);
+                res.end();
+            });
+        } break;
         case "CSF": {
             DB.Cheack_status_friend(_id, _id_other_player).then((result) => {
                 var Change_value = String(result);
@@ -514,14 +520,28 @@ class DB_model {
 
 
     async Cheack_Nick_name(Incomin_Nickname) {
-        var Connection = new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true });
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var result_find = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Nickname': Incomin_Nickname });
+
         if (result_find != null) {
             Connection.close();
-            return "1";
+            return "0";
         } else {
             Connection.close();
+            return "1";
+        }
+    }
+
+
+    async Cheack_User_name(Incoming_User_name) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var result_finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Username': Incoming_User_name });
+        if (result_finder != null) {
+            Connection.close();
             return "0";
+        } else {
+            Connection.close();
+            return "1";
         }
     }
 
