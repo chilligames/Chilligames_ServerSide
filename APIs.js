@@ -366,17 +366,11 @@ class DB_model {
 
     async Send_Score_to_leader_board(incoming_id, incoming_leaderboard_name, incoming_Score) {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
-        var _id = new mongo_raw.ObjectId(incoming_id);
 
-        this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+        this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = Number(incoming_Score);
 
-        if (this.Raw_Model_User.Leader_board[incoming_leaderboard_name] == undefined) {
-            this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = Number(incoming_Score);
-            await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $set: { 'Leader_board': this.Raw_Model_User.Leader_board } });
-        } else {
-            this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = Number(incoming_Score);
-            await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $set: { 'Leader_board': this.Raw_Model_User.Leader_board } });
-        }
+        await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $set: { 'Leader_board': this.Raw_Model_User.Leader_board } });
+
         connection.close();
     }
 
