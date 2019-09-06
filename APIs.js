@@ -535,7 +535,7 @@ class DB_model {
 
     async Cheack_User_name(Incoming_User_name) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
-        var result_finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Username': Incoming_User_name });
+        var result_finder = await Connection.db("Chilligames").collection("Users").findOne({ "Info.Username": Incoming_User_name });
         if (result_finder != null) {
             Connection.close();
             return "0";
@@ -544,6 +544,7 @@ class DB_model {
             return "1";
         }
     }
+    
 
     async Recive_ranking_posion(Incomin_id, Incomin_leader_board_name) {
 
