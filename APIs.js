@@ -364,47 +364,40 @@ class DB_model {
     }
 
 
-    async Send_Score_to_leader_board(incoming_id, incoming_leaderboard_name, incoming_Score = Number()) {
+    async Send_Score_to_leader_board(incoming_id, incoming_leaderboard_name, incoming_Score) {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var _id = new mongo_raw.ObjectId(incoming_id);
 
-        this.Raw_model_leader_board = await connection.db("Chilligames").collection(incoming_leaderboard_name).findOne({ 'ID': incoming_id });
         this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
 
-        if (this.Raw_model_leader_board == null) {
-
-            var new_leader_board = {
-                'ID': incoming_id,
-                'Nick_name': this.Raw_Model_User.Info.Nickname,
-                'Score': Number(incoming_Score)
-            };
-            await connection.db("Chilligames").collection(incoming_leaderboard_name).insertOne(new_leader_board);
-
+        if (this.Raw_Model_User.Leader_board[incoming_leaderboard_name] == undefined) {
             this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = Number(incoming_Score);
-
-            await connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { "Leader_board": this.Raw_Model_User.Leader_board } });
-            connection.close();
-
+            await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $set: { 'Leader_board': this.Raw_Model_User.Leader_board } });
         } else {
-            await connection.db("Chilligames").collection(incoming_leaderboard_name).updateOne({ 'ID': incoming_id }, { $set: { 'Score': Number(incoming_Score) } });
             this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = Number(incoming_Score);
-
-            await connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { 'Leader_board': this.Raw_Model_User.Leader_board } });
-            connection.close();
+            await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $set: { 'Leader_board': this.Raw_Model_User.Leader_board } });
         }
-
-
-
+        connection.close();
     }
 
 
     async Recive_leader_board(incoming_name_leader_board, incoming_count) {
 
-        var count = Number(incoming_count);
+        var Pipe_leader_board = "Leader_board." + incoming_name_leader_board;
+
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
-        var result_search = await Connection.db("Chilligames").collection(incoming_name_leader_board).find({}, { limit: count, sort: { 'Score': -1 } }).toArray();
-        Connection.close();
-        return result_search;
+        var result_search = await Connection.db("Chilligames").collection("Users").find({}, { limit: Number(incoming_count), projection: { [Pipe_leader_board]: 1, 'Info.Nickname': 1 } }).toArray();
+        var result = [];
+        for (var i = 0; i < result_search.length; i++) {
+            result[i] = {
+                '_id': result_search[i]._id,
+                'Nickname': result_search[i].Info.Nickname,
+                'Score': result_search[i].Leader_board[incoming_name_leader_board]
+            }
+        }
+
+        Connection.close(result);
+        return result;
     }
 
 
@@ -416,6 +409,18 @@ class DB_model {
         var result_recive_leader_board = await connection.db("Chilligames").collection(Incoming_leader_board_name).find({ 'Score': { $lt: Score_player } }, { limit: 5 }).toArray();
         connection.close();
         return result_recive_leader_board;
+    }
+
+
+    async Recive_ranking_posion(Incomin_id, Incomin_leader_board_name) {
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+
+        this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomin_id) });
+
+        var Count = await connection.db("Chilligames").collection("Users").find({ ["Leader_board." + Incomin_leader_board_name]: { $gt: Number(this.Raw_Model_User.Leader_board[Incomin_leader_board_name]) } }).count();
+
+        connection.close();
+        return Count;
     }
 
 
@@ -545,26 +550,7 @@ class DB_model {
         }
     }
 
-    async Recive_ranking_posion(Incomin_id, Incomin_leader_board_name) {
 
-        var postion;
-
-        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
-        this.Raw_model_leader_board = await connection.db("Chilligames").collection(Incomin_leader_board_name).findOne({ 'ID': Incomin_id });
-
-        if (this.Raw_model_leader_board != null) {
-            postion = await connection.db("Chilligames").collection(Incomin_leader_board_name).find({ "Score": { $gt: this.Raw_model_leader_board.Score } }, { sort: { "Score": -1 } }).toArray();
-
-            connection.close();
-            return postion.length;
-        } else {
-
-            postion = "N/A";
-            connection.close()
-            return postion;
-        }
-
-    }
 
 
     async Cheack_status_friend(Incoming_id_player, Incoming_id_other_player) {
@@ -634,8 +620,6 @@ class DB_model {
 
         Connection.close();
     }
-
-
 
 
     async Creat_server(Incoming_id, Incoming_name_app, Incoming_Setting_server) {
@@ -942,10 +926,7 @@ class DB_model {
             }
 
         }
-
-
         Connection.close();
-
         return result;
 
     }
@@ -957,7 +938,6 @@ class DB_model {
         Connection.close();
         return this.Raw_Model_User.Notifactions.Notifaction[Incoming_name_App];
     }
-
 
     async Remove_Notifaction_User(Incoming_id, Incoming_name_app) {
 
