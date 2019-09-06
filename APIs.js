@@ -58,10 +58,10 @@ app_api.get("/APIs", (req, res) => {
 
             });
         } break;
-        case "SLBNBY": {
+        case "RLBNU": {
 
-            DB.Recive_leader_board_near_by_user(_id, leader_board_name).then(() => {
-
+            DB.Recive_leader_board_near_by_user(_id, leader_board_name,Count_search).then((result) => {
+                res.send(result);
                 res.end();
             });
 
@@ -395,14 +395,26 @@ class DB_model {
     }
 
 
-    async Recive_leader_board_near_by_user(incoming_id, Incoming_leader_board_name) {
+    async Recive_leader_board_near_by_user(incoming_id, Incoming_leader_board_name,Incoming_Count) {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
-        var _id = new mongo_raw.ObjectId(incoming_id);
-        this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+        this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(incoming_id) });
+
         var Score_player = Number(this.Raw_Model_User.Leader_board[Incoming_leader_board_name]);
-        var result_recive_leader_board = await connection.db("Chilligames").collection(Incoming_leader_board_name).find({ 'Score': { $lt: Score_player } }, { limit: 5 }).toArray();
+
+        var result_recive_leader_board = await connection.db("Chilligames").collection("Users").find({ ['Leader_board.' + Incoming_leader_board_name]: { $lt: Score_player } }, { limit: Number(Incoming_Count), projection: { ['Leader_board.' + Incoming_leader_board_name]: 1, 'Info': 1 }, sort: { ['Leader_board.'+Incoming_leader_board_name]:-1}}).toArray();
+
+        var result = [];
+
+        for (var i = 0; i < result_recive_leader_board.length; i++) {
+            result[i] = {
+                '_id': result_recive_leader_board[i]._id,
+                'Nickname': result_recive_leader_board[i].Info.Nickname,
+                'Score': result_recive_leader_board[i].Leader_board[Incoming_leader_board_name]
+            };
+        }
+
         connection.close();
-        return result_recive_leader_board;
+        return result;
     }
 
 
@@ -543,8 +555,6 @@ class DB_model {
             return "1";
         }
     }
-
-
 
 
     async Cheack_status_friend(Incoming_id_player, Incoming_id_other_player) {
@@ -932,6 +942,7 @@ class DB_model {
         Connection.close();
         return this.Raw_Model_User.Notifactions.Notifaction[Incoming_name_App];
     }
+
 
     async Remove_Notifaction_User(Incoming_id, Incoming_name_app) {
 
