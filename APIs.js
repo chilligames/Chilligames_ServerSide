@@ -243,7 +243,7 @@ app_api.get("/APIs", (req, res) => {
 
         } break;
         case "SU": {
-            DB.Search_User(Nickname, Count_search).then((result) => {
+            DB.Search_User(Nickname).then((result) => {
                 res.send(result);
                 res.end();
             });
@@ -969,6 +969,10 @@ class DB_model {
     async Search_User(Incoming_Nick_name) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Nickname': Incoming_Nick_name }, { projection: { 'Info.Nickname': 1 } });
+
+        if (finder==null) {
+            finder = "0";
+        } 
         Connection.close();
         return finder;
     }
