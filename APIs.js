@@ -259,6 +259,13 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "RC": {
+            DB.Recive_coin(_id).then((Result) => {
+                res.end(Result)
+
+                res.end();
+            });
+        }
 
     }
 }).listen("3333", "127.0.0.1")
@@ -1004,4 +1011,14 @@ class DB_model {
         Connection.close();
     }
 
+
+    async Recive_coin(Incomin_id) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Count_coin = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomin_id) }, { projection: { 'Wallet.Coin': 1 } });
+
+        Connection.close();
+
+        return Count_coin.Wallet.Coin.toString();
+    }
 }
