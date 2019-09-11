@@ -21,6 +21,7 @@ app_api.get("/APIs", (req, res) => {
     var Status = req.header("Status");
     var Message = req.header("Message");
     var Setting_server = req.header("Setting_Server");
+    var Coin = req.header("Coin");
 
     switch (pipe_line) {
         case "QR": {
@@ -248,6 +249,12 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "CI": {
+            DB.insert_coin(_id, Coin).then(() => {
+                res.send();
+                res.end();
+            });
+        } break;
 
     }
 }).listen("3333", "127.0.0.1")
@@ -282,8 +289,8 @@ class DB_model {
         },
         "Teams": [],
         "Wallet": {
-            "Coin": "",
-            "Mony": ""
+            "Coin": 0,
+            "Mony": 0
 
         },
         "Servers": [],
@@ -424,7 +431,6 @@ class DB_model {
         this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomin_id) });
 
         var Count = await connection.db("Chilligames").collection("Users").find({ ["Leader_board." + Incomin_leader_board_name]: { $gt: Number(this.Raw_Model_User.Leader_board[Incomin_leader_board_name]) } }).count();
-
         connection.close();
         return Count;
     }
@@ -703,7 +709,7 @@ class DB_model {
             if (this.Raw_Model_User.Servers[Incoming_name_app][i] != null) {
 
                 for (var a = 0; a < this.Raw_Model_User.Servers[Incoming_name_app].length; a++) {
-                    if (server[a]==undefined) {
+                    if (server[a] == undefined) {
                         server[a] = this.Raw_Model_User.Servers[Incoming_name_app][i];
                         break;
                     }
@@ -711,7 +717,7 @@ class DB_model {
 
             }
         }
-     
+
         this.Raw_Model_User.Servers[Incoming_name_app] = server;
 
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Servers': this.Raw_Model_User.Servers } });
@@ -970,11 +976,20 @@ class DB_model {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Nickname': Incoming_Nick_name }, { projection: { 'Info.Nickname': 1 } });
 
-        if (finder==null) {
+        if (finder == null) {
             finder = "0";
-        } 
+        }
         Connection.close();
         return finder;
+    }
+
+
+    async insert_coin(Incoming_ID, Coin) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(Incoming_ID) });
+        this.Raw_Model_User.Wallet.Coin = (this.Raw_Model_User.Wallet.Coin + Number(Coin));
+        await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_ID) }, { $set: { 'Wallet.Coin': this.Raw_Model_User.Wallet.Coin }});
+        Connection.close();
     }
 
 }
