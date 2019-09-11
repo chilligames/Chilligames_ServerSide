@@ -251,7 +251,11 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "CI": {
             DB.insert_coin(_id, Coin).then(() => {
-                res.send();
+                res.end();
+            });
+        } break;
+        case "SCWS": {
+            DB.Sync_coin_with_server(_id, Coin).then(() => {
                 res.end();
             });
         } break;
@@ -988,7 +992,15 @@ class DB_model {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(Incoming_ID) });
         this.Raw_Model_User.Wallet.Coin = (this.Raw_Model_User.Wallet.Coin + Number(Coin));
-        await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_ID) }, { $set: { 'Wallet.Coin': this.Raw_Model_User.Wallet.Coin }});
+        await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_ID) }, { $set: { 'Wallet.Coin': this.Raw_Model_User.Wallet.Coin } });
+        Connection.close();
+    }
+
+
+    async Sync_coin_with_server(Incomin_id, Coin) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incomin_id) }, { $set: { 'Wallet.Coin': Number(Coin) } });
         Connection.close();
     }
 
