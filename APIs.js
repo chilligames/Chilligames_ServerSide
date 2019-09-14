@@ -5,6 +5,7 @@ var app_api = Express();
 app_api.get("/APIs", (req, res) => {
     var DB = new DB_model();
     var pipe_line = req.header("Pipe_line");
+    var Pipe_line_data = req.header("Pipe_line_data");
     var _id = req.header("_id");
     var _id_server = req.header("_id_Server");
     var _id_other_player = req.header("_id_other_player");
@@ -21,6 +22,7 @@ app_api.get("/APIs", (req, res) => {
     var Status = req.header("Status");
     var Message = req.header("Message");
     var Setting_server = req.header("Setting_Server");
+    var Data_inject = req.header("Data_inject");
     var Coin = req.header("Coin");
 
     switch (pipe_line) {
@@ -265,7 +267,13 @@ app_api.get("/APIs", (req, res) => {
 
                 res.end();
             });
-        }
+        } break;
+        case "CDTS": {
+            DB.Change_data_to_server_Fild(Name_App, _id_server, Pipe_line_data, Data_inject).then(() => {
+                res.end();
+            });
+        } break;
+
 
     }
 }).listen("3333", "127.0.0.1")
@@ -784,6 +792,12 @@ class DB_model {
     }
 
 
+    async Change_data_to_server_Fild(incoming_name_app, Incoming_id_server, incomin_pipe_line, incoming_data) {
+        var Connections = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        await Connections.db("Chilligames_Servers").collection(incoming_name_app).findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_server) }, {$set:{ [incomin_pipe_line]:Number( incoming_data) }});
+        Connections.close();
+    }
+
     async Send_message_to_chatroom(Incoming_ID, Incoming_name_app, Incoming_message) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
@@ -1021,4 +1035,6 @@ class DB_model {
 
         return Count_coin.Wallet.Coin.toString();
     }
+
+
 }
