@@ -278,6 +278,13 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "PDTSF": {
+            DB.push_data_to_server_fild(Name_App,_id_server,Pipe_line_data,Data_inject).then(() => {
+
+                res.end();
+
+            });
+        } break;
 
 
     }
@@ -803,11 +810,20 @@ class DB_model {
         Connections.close();
     }
 
+
     async Pluse_data_server_fild(Incomin_name_app, incoming_id_server, incoming_pipe_line, incoming_data) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         await Connection.db("Chilligames_Servers").collection(Incomin_name_app).findOneAndUpdate({ '_id': new mongo_raw.ObjectID(incoming_id_server) }, { $inc: { [incoming_pipe_line]: Number(incoming_data) } });
         Connection.close();
     }
+
+
+    async push_data_to_server_fild(Incomin_name_app, Incomin_id_server, Incomin_pipe_line, Incomin_data) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, {useNewUrlParser:true}).connect();
+        await Connection.db("Chilligames_Servers").collection(Incomin_name_app).findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incomin_id_server) }, { $push: { [Incomin_pipe_line]:JSON.parse( Incomin_data )} });
+        Connection.close();
+    }
+
 
     async Send_message_to_chatroom(Incoming_ID, Incoming_name_app, Incoming_message) {
 
