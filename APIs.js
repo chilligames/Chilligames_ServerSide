@@ -279,7 +279,7 @@ app_api.get("/APIs", (req, res) => {
             });
         } break;
         case "PDTSF": {
-            DB.push_data_to_server_fild(Name_App,_id_server,Pipe_line_data,Data_inject).then(() => {
+            DB.push_data_to_server_fild(Name_App, _id_server, Pipe_line_data, Data_inject).then(() => {
 
                 res.end();
 
@@ -819,8 +819,8 @@ class DB_model {
 
 
     async push_data_to_server_fild(Incomin_name_app, Incomin_id_server, Incomin_pipe_line, Incomin_data) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, {useNewUrlParser:true}).connect();
-        await Connection.db("Chilligames_Servers").collection(Incomin_name_app).findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incomin_id_server) }, { $push: { [Incomin_pipe_line]:JSON.parse( Incomin_data )} });
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        await Connection.db("Chilligames_Servers").collection(Incomin_name_app).findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incomin_id_server) }, { $push: { [Incomin_pipe_line]: JSON.parse(Incomin_data) } });
         Connection.close();
     }
 
@@ -1065,3 +1065,31 @@ class DB_model {
 
 
 }
+
+
+
+class Server_manager {
+
+    async Control_time() {
+        var sleep = (a) => { return new Promise(res => setTimeout(res, a)); }
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var list = await Connection.db("Chilligames_Servers").listCollections().toArray();
+
+        while (true) {
+            await sleep(2000);
+            for (var i = 0; i < list.length; i++) {
+
+                await Connection.db("Chilligames_Servers").collection(list[i].name).updateMany({}, { $inc: { 'Setting.Active_Days': 1 } });
+                var Must_delete = await Connection.db("Chilligames_Servers").collection(list[i].name).find({ 'Setting.Active_Days': { $gt: 0 } }).toArray();
+                for (var a = 0; a < Must_delete.length; a++) {
+                    await Connection.db("Chilligames").collection("Users").updateOne({}, { $pullAll: { ["Servers."+list[i].name]: [String (Must_delete[a]._id)] } });
+                }
+            }
+        }
+
+    }
+}
+
+
+new Server_manager().Control_time();
