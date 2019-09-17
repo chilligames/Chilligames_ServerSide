@@ -1085,6 +1085,8 @@ class Server_manager {
                 for (var a = 0; a < Must_delete.length; a++) {
                     await Connection.db("Chilligames").collection("Users").updateOne({}, { $pullAll: { ["Servers."+list[i].name]: [String (Must_delete[a]._id)] } });
                 }
+                await Connection.db("Chilligames_Server").collection(list[i].name).findOneAndDelete({ 'Setting.Active_Days': { $gt: 0 } });
+
             }
         }
 
