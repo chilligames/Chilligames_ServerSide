@@ -24,6 +24,8 @@ app_api.get("/APIs", (req, res) => {
     var Setting_server = req.header("Setting_Server");
     var Data_inject = req.header("Data_inject");
     var Coin = req.header("Coin");
+    var Name_entity = req.header("Name_Entity");
+    var ID_entity = req.header("ID_Entity");
 
     switch (pipe_line) {
         case "QR": {
@@ -264,7 +266,7 @@ app_api.get("/APIs", (req, res) => {
         case "RCMU": {
             DB.Recive_coin_Mony(_id).then((Result) => {
                 res.send(Result);
-                
+
                 res.end();
             });
         } break;
@@ -285,6 +287,13 @@ app_api.get("/APIs", (req, res) => {
 
             });
         } break;
+        case "POFA": {
+            DB.Push_Offer_for_all(Name_App, Name_entity, Coin, ID_entity).then(result => {
+
+
+                res.end();
+            });
+        }
 
 
     }
@@ -321,7 +330,8 @@ class DB_model {
         "Teams": [],
         "Wallet": {
             "Coin": 0,
-            "Mony": 0
+            "Mony": 0,
+            "Offrers":{ }
 
         },
         "Servers": [],
@@ -1059,10 +1069,22 @@ class DB_model {
         var Count_coin = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomin_id) }, { projection: { 'Wallet': 1 } });
 
         Connection.close();
-     
+
         return Count_coin.Wallet;
     }
 
+
+    async Push_Offer_for_all(Incoming_name_app, incomin_name_entity, Incoming_Coin, Incoming_ID_entity) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var entity_inject = {
+            'ID': Incoming_ID_entity,
+            'Name_Entity': incomin_name_entity,
+            'Coin': Number(Incoming_Coin)
+        }
+        await Connection.db("Chilligames").collection("Users").updateMany({}, { $push: { ['Wallet.Offers.' + Incoming_name_app]: entity_inject } });
+        Connection.close();
+    }
 
 
 }
