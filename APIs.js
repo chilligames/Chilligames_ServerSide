@@ -293,7 +293,13 @@ app_api.get("/APIs", (req, res) => {
 
                 res.end();
             });
-        }
+        } break;
+        case "POFO": {
+            DB.push_offer_for_one_player(_id, Name_App, Name_entity, Coin, ID_entity).then(() => {
+
+                res.end();
+            });
+        } break;
 
 
     }
@@ -331,7 +337,7 @@ class DB_model {
         "Wallet": {
             "Coin": 0,
             "Mony": 0,
-            "Offrers":{ }
+            "Offrers": {}
 
         },
         "Servers": [],
@@ -1087,6 +1093,20 @@ class DB_model {
     }
 
 
+    async push_offer_for_one_player(incomin_ID, Incoing_name_app, incomin_name_entity, incoming_coin, incoming_id_entity) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+
+        var Offer_inject = {
+            'ID': incoming_id_entity,
+            'Name_Entity': incomin_name_entity,
+            'Coin': Number(incoming_coin)
+        }
+
+        await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incomin_ID) }, { $push: { ['Wallet.Offers.' + Incoing_name_app]: Offer_inject } });
+
+        Connection.close();
+    }
 }
 
 
