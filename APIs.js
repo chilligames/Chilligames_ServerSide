@@ -261,10 +261,10 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
-        case "RC": {
-            DB.Recive_coin(_id).then((Result) => {
-                res.end(Result)
-
+        case "RCMU": {
+            DB.Recive_coin_Mony(_id).then((Result) => {
+                res.send(Result);
+                
                 res.end();
             });
         } break;
@@ -1053,15 +1053,16 @@ class DB_model {
     }
 
 
-    async Recive_coin(Incomin_id) {
+    async Recive_coin_Mony(Incomin_id) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
-        var Count_coin = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomin_id) }, { projection: { 'Wallet.Coin': 1 } });
+        var Count_coin = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomin_id) }, { projection: { 'Wallet': 1 } });
 
         Connection.close();
-
-        return Count_coin.Wallet.Coin.toString();
+     
+        return Count_coin.Wallet;
     }
+
 
 
 }
@@ -1083,7 +1084,7 @@ class Server_manager {
                 await Connection.db("Chilligames_Servers").collection(list[i].name).updateMany({}, { $inc: { 'Setting.Active_Days': 1 } });
                 var Must_delete = await Connection.db("Chilligames_Servers").collection(list[i].name).find({ 'Setting.Active_Days': { $gt: 0 } }).toArray();
                 for (var a = 0; a < Must_delete.length; a++) {
-                    await Connection.db("Chilligames").collection("Users").updateOne({}, { $pullAll: { ["Servers."+list[i].name]: [String (Must_delete[a]._id)] } });
+                    await Connection.db("Chilligames").collection("Users").updateOne({}, { $pullAll: { ["Servers." + list[i].name]: [String(Must_delete[a]._id)] } });
                 }
                 await Connection.db("Chilligames_Server").collection(list[i].name).findOneAndDelete({ 'Setting.Active_Days': { $gt: 0 } });
 
