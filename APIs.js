@@ -300,6 +300,11 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "RO": {
+            DB.Recive_offers(_id, Name_App).then(result => {
+                res.end();
+            });
+        } break;
 
 
     }
@@ -1103,8 +1108,16 @@ class DB_model {
             'Coin': Number(incoming_coin)
         }
 
-        await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incomin_ID) }, { $push: { ['Wallet.Offers.' + Incoing_name_app]: Offer_inject } });
+        await Connecteion.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incomin_ID) }, { $push: { ['Wallet.Offers.' + Incoing_name_app]: Offer_inject } });
 
+        Connection.close();
+    }
+
+
+    async Recive_offers(Incoming_id, Incoming_name_app) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var a = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { projection: { ['Wallet.Offers.' + Incoming_name_app]: 1 } });
+        console.log(a.Wallet.Offers.Venomic);
         Connection.close();
     }
 }
