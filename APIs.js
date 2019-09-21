@@ -1134,16 +1134,21 @@ class DB_model {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_ID) });
+
+
         if (Number(Incoming_mode) == 0) {
 
-            var Money = (Incoming_count / 500) + this.Raw_Model_User.Wallet.Money;
-            await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_ID) }, { $inc: { 'Wallet.Coin': -Incoming_count } });
+            var Money = (Number(Incoming_count) / 500) + this.Raw_Model_User.Wallet.Money;
+
             await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_ID) }, { $set: { 'Wallet.Money': Money } });
+            await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_ID) }, { $inc: { 'Wallet.Coin': - Number(Incoming_count) } });
+
             Connection.close();
 
         } else if (Number(Incoming_mode) == 1) {
-            var Coin = (Incoming_count * 470) + this.Raw_Model_User.Wallet.Coin;
+            var Coin = (Number(Incoming_count) * 470) + this.Raw_Model_User.Wallet.Coin;
             await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_ID) }, { $set: { 'Wallet.Coin': Coin } });
+            await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_ID) }, { $inc: { 'Wallet.Money': - Number(Incoming_count) } });
             Connection.close();
         }
 
