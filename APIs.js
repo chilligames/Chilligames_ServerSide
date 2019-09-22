@@ -27,6 +27,7 @@ app_api.get("/APIs", (req, res) => {
     var Name_entity = req.header("Name_Entity");
     var ID_entity = req.header("ID_Entity");
     var Mode = req.header("Mode");
+    var Key = req.header("Key");
     switch (pipe_line) {
         case "QR": {
 
@@ -288,15 +289,12 @@ app_api.get("/APIs", (req, res) => {
             });
         } break;
         case "POFA": {
-            DB.Push_Offer_for_all(Name_App, Name_entity, Coin, ID_entity).then(result => {
-
-
+            DB.Push_Offer_for_all(Name_App, Name_entity, Coin, ID_entity, Count_search, Key).then(result => {
                 res.end();
             });
         } break;
         case "POFO": {
-            DB.push_offer_for_one_player(_id, Name_App, Name_entity, Coin, ID_entity).then(() => {
-
+            DB.push_offer_for_one_player(_id, Name_App, Name_entity, Coin, ID_entity, Count_search, Key).then(() => {
                 res.end();
             });
         } break;
@@ -1092,12 +1090,14 @@ class DB_model {
     }
 
 
-    async Push_Offer_for_all(Incoming_name_app, incomin_name_entity, Incoming_Coin, Incoming_ID_entity) {
+    async Push_Offer_for_all(Incoming_name_app, incomin_name_entity, Incoming_Coin, Incoming_ID_entity, Incoming_count, Incoming_Key) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var entity_inject = {
             'ID': Incoming_ID_entity,
+            'Key': Incoming_Key,
             'Name_Entity': incomin_name_entity,
+            'Count': Number(Incoming_count),
             'Coin': Number(Incoming_Coin)
         }
         await Connection.db("Chilligames").collection("Users").updateMany({}, { $push: { ['Wallet.Offers.' + Incoming_name_app]: entity_inject } });
@@ -1105,13 +1105,15 @@ class DB_model {
     }
 
 
-    async push_offer_for_one_player(incomin_ID, Incoing_name_app, incomin_name_entity, incoming_coin, incoming_id_entity) {
+    async push_offer_for_one_player(incomin_ID, Incoing_name_app, incomin_name_entity, incoming_coin, incoming_id_entity, incoming_count, Incoming_key) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
 
         var Offer_inject = {
             'ID': incoming_id_entity,
+            'Key': Incoming_key,
             'Name_Entity': incomin_name_entity,
+            'Count': Number(incoming_count),
             'Coin': Number(incoming_coin)
         }
 
