@@ -310,6 +310,11 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "RAOM": {
+            DB.Remove_All_offer_match(Name_App, ID_entity).then(() => {
+                res.end();
+            });
+        } break;
 
 
     }
@@ -1130,6 +1135,43 @@ class DB_model {
         return result.Wallet.Offers[Incoming_name_app];
     }
 
+
+    async Remove_All_offer_match(Incoming_name_app, Incoming_offer_id, ) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var result_finde = await Connection.db("Chilligames").collection("Users").find({ ['Wallet.Offers.' + Incoming_name_app + '.' + 'ID']: Incoming_offer_id }).toArray();
+
+        for (var i = 0; i < result_finde.length; i++) {
+
+            for (var a = 0; a < result_finde[i].Wallet.Offers[Incoming_name_app].length; a++) {
+                if (result_finde[i].Wallet.Offers[Incoming_name_app][a].ID == Incoming_offer_id) {
+                    delete result_finde[i].Wallet.Offers[Incoming_name_app][a];
+                    break;
+                }
+            }
+
+            var Offers = [];
+            Offers.length = result_finde[i].Wallet.Offers[Incoming_name_app].length - 1;
+
+            for (var b = 0; b < result_finde[i].Wallet.Offers[Incoming_name_app].length; b++) {
+
+                if (result_finde[i].Wallet.Offers[Incoming_name_app][b] != undefined) {
+
+                    for (var c = 0; c < Offers.length; c++) {
+
+                        if (Offers[c] == undefined) {
+                            Offers[c] = result_finde[i].Wallet.Offers[Incoming_name_app][b];
+                            break;
+                        }
+                    }
+                }
+            }
+            result_finde[i].Wallet.Offers[Incoming_name_app] = Offers;
+            await Connection.db("Chilligames").collection("Users").updateOne({ '_id': result_finde[i]._id }, { $set: { ['Wallet.Offers.' + Incoming_name_app]: result_finde[i].Wallet.Offers[Incoming_name_app] } });
+        }
+
+
+        Connection.close();
+    }
 
     async Convert_money_to_coin_Coin_to_money(Incoming_ID, Incoming_mode, Incoming_count) {
 
