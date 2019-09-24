@@ -445,7 +445,7 @@ class DB_model {
         var finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Username': Incoming_Username, 'Info.Password': Incoming_password });
         if (finder != null) {
             Connection.close();
-            return finder._id;
+            return finder._id.toHexString();
         } else {
             Connection.close();
             return "0";
