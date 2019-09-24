@@ -108,7 +108,8 @@ app_api.get("/APIs", (req, res) => {
 
         } break;
         case "RDU": {
-            DB.recive_data_user(_id, Name_App).then(() => {
+            DB.recive_data_user(_id, Name_App).then((result) => {
+                res.send(result);
                 res.end();
             });
         } break;
@@ -563,10 +564,9 @@ class DB_model {
     async recive_data_user(Incoming_id, Incoming_name_app) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
         var _id = new mongo_raw.ObjectId(Incoming_id);
-        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
-
+        var Data = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id }, { projection: { ['Data.' + Incoming_name_app]: 1 } });
         Connection.close();
-        return this.Raw_Model_User.Data[Incoming_name_app];
+        return Data.Data[Incoming_name_app];
     }
 
 
