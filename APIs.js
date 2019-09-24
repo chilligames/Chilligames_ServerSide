@@ -48,6 +48,12 @@ app_api.get("/APIs", (req, res) => {
             });
 
         } break;
+        case "LWUP": {
+            DB.Login_with_User_name_password(Username, Password).then(result => {
+                res.send(result);
+                res.end();
+            });
+        } break;
         case "SSTLB": {
 
             DB.Send_Score_to_leader_board(_id, leader_board_name, Score).then(() => {
@@ -432,6 +438,19 @@ class DB_model {
         }
     }
 
+
+    async Login_with_User_name_password(Incoming_Username, Incoming_password) {
+
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Username': Incoming_Username, 'Info.Password': Incoming_password });
+        if (finder != null) {
+            Connection.close();
+            return finder._id;
+        } else {
+            Connection.close();
+            return "0";
+        }
+    }
 
     async Send_Score_to_leader_board(incoming_id, incoming_leaderboard_name, incoming_Score) {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
