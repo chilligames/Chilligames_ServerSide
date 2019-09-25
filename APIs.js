@@ -1,6 +1,6 @@
 ﻿var Express = require('express');
 var app_api = Express();
-
+//var nodemailer = require('nodemailer'); 
 
 app_api.get("/APIs", (req, res) => {
     var DB = new DB_model();
@@ -41,15 +41,19 @@ app_api.get("/APIs", (req, res) => {
         case "QL": {
 
             DB.Quick_login(_id).then(result => {
-
                 res.send(result);
                 res.end();
-
             });
 
         } break;
         case "LWUP": {
             DB.Login_with_User_name_password(Username, Password).then(result => {
+                res.send(result);
+                res.end();
+            });
+        } break;
+        case "RE": {
+            DB.Recovery_email(Email).then(result => {
                 res.send(result);
                 res.end();
             });
@@ -452,8 +456,6 @@ class DB_model {
             return "0";
         }
     }
-
-    
 
     async Send_Score_to_leader_board(incoming_id, incoming_leaderboard_name, incoming_Score) {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
