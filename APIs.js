@@ -408,7 +408,7 @@ class DB_model {
 
     async Quick_register() {
 
-        var connected = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var connected = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
 
         var Result_insert = await connected.db("Chilligames").collection("Users").insertOne(this.Raw_Model_User);
 
@@ -427,7 +427,7 @@ class DB_model {
     async Quick_login(Incoming_id) {
 
         var _id = new mongo_raw.ObjectId(Incoming_id);
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true,useUnifiedTopology:true}).connect();
         var result_search = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
         if (result_search != null) {
 
@@ -442,7 +442,7 @@ class DB_model {
 
     async Login_with_User_name_password(Incoming_Username, Incoming_password) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Username': Incoming_Username, 'Info.Password': Incoming_password });
         if (finder != null) {
             Connection.close();
@@ -453,8 +453,10 @@ class DB_model {
         }
     }
 
+    
+
     async Send_Score_to_leader_board(incoming_id, incoming_leaderboard_name, incoming_Score) {
-        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
 
         this.Raw_Model_User.Leader_board[incoming_leaderboard_name] = Number(incoming_Score);
 
@@ -468,7 +470,7 @@ class DB_model {
 
         var Pipe_leader_board = "Leader_board." + incoming_name_leader_board;
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var result_search = await Connection.db("Chilligames").collection("Users").find({}, { limit: Number(incoming_count), projection: { [Pipe_leader_board]: 1, 'Info.Nickname': 1 } }).toArray();
         var result = [];
         for (var i = 0; i < result_search.length; i++) {
@@ -485,7 +487,7 @@ class DB_model {
 
 
     async Recive_leader_board_near_by_user(incoming_id, Incoming_leader_board_name, Incoming_Count) {
-        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(incoming_id) });
 
         var Score_player = Number(this.Raw_Model_User.Leader_board[Incoming_leader_board_name]);
@@ -508,7 +510,7 @@ class DB_model {
 
 
     async Recive_ranking_posion(Incomin_id, Incomin_leader_board_name) {
-        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
 
         this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomin_id) });
 
@@ -519,7 +521,7 @@ class DB_model {
 
 
     async Recive_Score_Player(Incomin_id, Incomin_leader_board_name) {
-        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var _id = new mongo_raw.ObjectID(Incomin_id);
         this.Raw_Model_User = await connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
         connection.close();
@@ -528,7 +530,7 @@ class DB_model {
 
 
     async Recive_Info_other_user(Incomin_id) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var _id = new mongo_raw.ObjectId(Incomin_id);
         var search_user = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
         Connection.close();
@@ -537,7 +539,7 @@ class DB_model {
 
 
     async Recive_info_user(Incoming_id) {
-        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var _id = new mongo_raw.ObjectId(Incoming_id);
         var Schema_info_user;
 
@@ -549,7 +551,7 @@ class DB_model {
 
     async Send_data_user(Incoming_id, Incomin_data, Incoming_name_app) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var _id = new mongo_raw.ObjectId(Incoming_id);
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
@@ -562,7 +564,7 @@ class DB_model {
 
 
     async recive_data_user(Incoming_id, Incoming_name_app) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var _id = new mongo_raw.ObjectId(Incoming_id);
         var Data = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id }, { projection: { ['Data.' + Incoming_name_app]: 1 } });
         Connection.close();
@@ -571,7 +573,7 @@ class DB_model {
 
 
     async Update_User_Info(Incoming_id, Incoming_nickname = String(), Incoming_username = String(), Incoming_Email = String(), Incoming_password = String(), Incoming_status = String()) {
-        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var _id = new mongo_raw.ObjectId(Incoming_id);
 
         if (Incoming_nickname.length > 1) {
@@ -618,7 +620,7 @@ class DB_model {
 
 
     async Cheack_Nick_name(Incomin_Nickname) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var result_find = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Nickname': Incomin_Nickname });
 
         if (result_find != null) {
@@ -632,7 +634,7 @@ class DB_model {
 
 
     async Cheack_User_name(Incoming_User_name) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var result_finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Username': Incoming_User_name });
         if (result_finder != null) {
             Connection.close();
@@ -645,7 +647,7 @@ class DB_model {
 
 
     async Cheack_status_friend(Incoming_id_player, Incoming_id_other_player) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
 
         var _id = new mongo_raw.ObjectId(Incoming_id_player);
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
@@ -671,7 +673,7 @@ class DB_model {
 
     async Send_friend_requst(Incoming_id, Incoming_id_other_player) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
 
         var _id = new mongo_raw.ObjectId(Incoming_id);
 
@@ -687,7 +689,7 @@ class DB_model {
 
     async Cancel_friend_requst(Incoming_id, Incoming_id_other_player) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var _id = new mongo_raw.ObjectID(Incoming_id);
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
 
@@ -717,7 +719,7 @@ class DB_model {
 
         var _id = new mongo_raw.ObjectId(Incoming_id);
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var Parse_to_json = JSON.parse(Incoming_Setting_server);
         this.Raw_model_insert_server.ID = Incoming_id;
         this.Raw_model_insert_server.Setting = Parse_to_json;
@@ -744,7 +746,7 @@ class DB_model {
 
     async Recive_List_Servers_User(Incomin_id, Incoming_name_app) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var _id = new mongo_raw.ObjectId(Incomin_id);
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
@@ -758,7 +760,7 @@ class DB_model {
 
     async Recive_data_Server(Incomin_id_server, Incoming_name_app) {
 
-        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var _id_server = new mongo_raw.ObjectId(Incomin_id_server);
 
         var result_search = await connection.db("Chilligames_Servers").collection(Incoming_name_app).findOne({ '_id': _id_server });
@@ -771,7 +773,7 @@ class DB_model {
 
         var _id = new mongo_raw.ObjectId(IncomingID);
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
 
@@ -809,7 +811,7 @@ class DB_model {
 
     async Recive_all_Servers(Incoming_name_app, Incoming_count_server) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var result = await Connection.db("Chilligames_Servers").collection(Incoming_name_app).find({}, { limit: Number(Incoming_count_server) }).toArray();
         Connection.close();
         return result;
@@ -818,7 +820,7 @@ class DB_model {
 
     async Cheack_server_in_profile(Incoming_ID, Incoming_name_app, Incoming_id_server) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var _id = new mongo_raw.ObjectId(Incoming_ID);
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
@@ -843,7 +845,7 @@ class DB_model {
 
     async Enter_To_Server(Incomng_ID, Incoming_name_app, Incoming_id_server) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var _id = new mongo_raw.ObjectID(Incomng_ID);
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
@@ -855,21 +857,21 @@ class DB_model {
 
 
     async Change_data_to_server_Fild(incoming_name_app, Incoming_id_server, incomin_pipe_line, incoming_data) {
-        var Connections = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connections = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         await Connections.db("Chilligames_Servers").collection(incoming_name_app).findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_server) }, { $set: { [incomin_pipe_line]: Number(incoming_data) } });
         Connections.close();
     }
 
 
     async Pluse_data_server_fild(Incomin_name_app, incoming_id_server, incoming_pipe_line, incoming_data) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         await Connection.db("Chilligames_Servers").collection(Incomin_name_app).findOneAndUpdate({ '_id': new mongo_raw.ObjectID(incoming_id_server) }, { $inc: { [incoming_pipe_line]: Number(incoming_data) } });
         Connection.close();
     }
 
 
     async push_data_to_server_fild(Incomin_name_app, Incomin_id_server, Incomin_pipe_line, Incomin_data) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         await Connection.db("Chilligames_Servers").collection(Incomin_name_app).findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incomin_id_server) }, { $push: { [Incomin_pipe_line]: JSON.parse(Incomin_data) } });
         Connection.close();
     }
@@ -877,7 +879,7 @@ class DB_model {
 
     async Send_message_to_chatroom(Incoming_ID, Incoming_name_app, Incoming_message) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(Incoming_ID) });
 
         var postion = await Connection.db("Chilligames_Chat").collection(Incoming_name_app).find({}, { sort: { 'Postion': -1 } }).toArray();
@@ -899,7 +901,7 @@ class DB_model {
 
     async Recive_Chatroom_Messages(Incoming_Name_App) {
 
-        var Connections = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connections = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var Count_call_back = await Connections.db("Chilligames_Chat").collection(Incoming_Name_App).countDocuments() - 10;
 
         var result_find = await Connections.db("Chilligames_Chat").collection(Incoming_Name_App).find({ 'Postion': { $gte: Count_call_back } }, { sort: { 'Postion': 1 } }).toArray();
@@ -910,7 +912,7 @@ class DB_model {
 
     async Report_message(Incoming_message_id, Incoming_name_app, ) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
 
         this.Raw_model_messegae_chatroom = await Connection.db("Chilligames_Chat").collection(Incoming_name_app).findOne({ '_id': new mongo_raw.ObjectId(Incoming_message_id) });
 
@@ -930,7 +932,7 @@ class DB_model {
 
     async Send_messege_to_users(Incoming_id, Incoming_id_other_player, _incoming_message_body) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         this.Raw_model_messages.ID = Incoming_id_other_player;
         this.Raw_model_messages.Last_Date = new Date().toUTCString();
         this.Raw_model_messages.Status = 0;
@@ -1026,7 +1028,7 @@ class DB_model {
 
     async Recive_Messeges_User(Incoming_id) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
         Connection.close();
         return this.Raw_Model_User.Notifactions.Message;
@@ -1034,7 +1036,7 @@ class DB_model {
 
 
     async Recive_messge_each_user(Incoming_id, Incoming_id_other_uer) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
         var result = [];
 
@@ -1054,7 +1056,7 @@ class DB_model {
 
 
     async Recive_notifactions(Incoming_id, Incoming_name_App) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
         Connection.close();
         return this.Raw_Model_User.Notifactions.Notifaction[Incoming_name_App];
@@ -1063,7 +1065,7 @@ class DB_model {
 
     async Remove_Notifaction_User(Incoming_id, Incoming_name_app) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
 
@@ -1075,7 +1077,7 @@ class DB_model {
 
 
     async Search_User(Incoming_Nick_name) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Nickname': Incoming_Nick_name }, { projection: { 'Info.Nickname': 1 } });
 
         if (finder == null) {
@@ -1087,7 +1089,7 @@ class DB_model {
 
 
     async insert_coin(Incoming_ID, Coin) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(Incoming_ID) });
         this.Raw_Model_User.Wallet.Coin = (this.Raw_Model_User.Wallet.Coin + Number(Coin));
         await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_ID) }, { $set: { 'Wallet.Coin': this.Raw_Model_User.Wallet.Coin } });
@@ -1097,7 +1099,7 @@ class DB_model {
 
     async Sync_coin_with_server(Incomin_id, Coin) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incomin_id) }, { $set: { 'Wallet.Coin': Number(Coin) } });
         Connection.close();
     }
@@ -1105,7 +1107,7 @@ class DB_model {
 
     async Recive_coin_Mony(Incomin_id) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var Count_coin = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomin_id) }, { projection: { 'Wallet': 1 } });
 
         Connection.close();
@@ -1116,7 +1118,7 @@ class DB_model {
 
     async Push_Offer_for_all(Incoming_name_app, incomin_name_entity, Incoming_Coin, Incoming_ID_entity, Incoming_count, Incoming_Key) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var entity_inject = {
             'ID': Incoming_ID_entity,
             'Key': Incoming_Key,
@@ -1131,7 +1133,7 @@ class DB_model {
 
     async push_offer_for_one_player(incomin_ID, Incoing_name_app, incomin_name_entity, incoming_coin, incoming_id_entity, incoming_count, Incoming_key) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
 
         var Offer_inject = {
             'ID': incoming_id_entity,
@@ -1148,7 +1150,7 @@ class DB_model {
 
 
     async Recive_offers(Incoming_id, Incoming_name_app) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var result = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { projection: { ['Wallet.Offers.' + Incoming_name_app]: 1 } });
         Connection.close();
         return result.Wallet.Offers[Incoming_name_app];
@@ -1156,7 +1158,7 @@ class DB_model {
 
 
     async Remove_All_offer_match(Incoming_name_app, Incoming_offer_id, ) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var result_finde = await Connection.db("Chilligames").collection("Users").find({ ['Wallet.Offers.' + Incoming_name_app + '.' + 'ID']: Incoming_offer_id }).toArray();
 
         for (var i = 0; i < result_finde.length; i++) {
@@ -1195,7 +1197,7 @@ class DB_model {
 
     async Convert_money_to_coin_Coin_to_money(Incoming_ID, Incoming_mode, Incoming_count) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_ID) });
 
@@ -1226,7 +1228,7 @@ class Server_manager {
     async Control_time() {
         var sleep = (a) => { return new Promise(res => setTimeout(res, a)); }
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true }).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true,useUnifiedTopology:true}).connect();
         var list = await Connection.db("Chilligames_Servers").listCollections().toArray();
 
         while (true) {
