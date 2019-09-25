@@ -1,6 +1,6 @@
 ﻿var Express = require('express');
 var app_api = Express();
-//var nodemailer = require('nodemailer'); 
+var nodemailer = require('nodemailer');
 
 app_api.get("/APIs", (req, res) => {
     var DB = new DB_model();
@@ -53,7 +53,7 @@ app_api.get("/APIs", (req, res) => {
             });
         } break;
         case "RE": {
-            DB.Recovery_email(Email).then(result => {
+            DB.Recovery_email_send(Email).then(result => {
                 res.send(result);
                 res.end();
             });
@@ -338,15 +338,14 @@ var Mongo_string = "mongodb://localhost:27017/admin";
 
 class DB_model {
 
-
-
     Raw_Model_User = {
         "Info": {
             "Username": '',
             'Password': '',
             'Email': '',
             'Nickname': '',
-            'Status': ''
+            'Status': '',
+            'Reset_code': ""
         },
         "Ban": [],
         "Friends": [],
@@ -364,7 +363,6 @@ class DB_model {
             "Coin": 0,
             "Money": 0.0,
             "Offrers": {}
-
         },
         "Servers": [],
         "Leader_board": {}
@@ -431,7 +429,7 @@ class DB_model {
     async Quick_login(Incoming_id) {
 
         var _id = new mongo_raw.ObjectId(Incoming_id);
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true,useUnifiedTopology:true}).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var result_search = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
         if (result_search != null) {
 
@@ -456,6 +454,48 @@ class DB_model {
             return "0";
         }
     }
+
+
+    async Recovery_email_send(Incoming_email) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+        var finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Email': Incoming_email });
+        if (finder != null) {
+
+            var min = 5;
+            var max =9 ;
+            var code_reset =Math.random() * max * max +min+min;
+
+            await Connection.db("Chilligames").collection("Users").updateOne({ 'Info.Email': Incoming_email }, { $set: { 'Info.Reset_code': String(code_reset) }});
+
+            var transform = nodemailer.createTransport({
+                host: 'chilligames.ir',
+                auth: {
+                    user: 'dontreplay@chilligames.ir',
+                    pass: '85245685hHH!',
+                },
+                secure: true,
+                port: 465,
+
+            })
+            var mail_detail = {
+                from: 'dontreplay@chilligames.ir',
+                to: Incoming_email,
+                subject: 'Account recovery',
+                text: 'Account recovery \n Hello \n This email is to restore your account and do not respond to it.\n Use this code to recover your account:\n '+code_reset
+            }
+
+            transform.sendMail(mail_detail);
+
+            return "1";
+        } else {
+
+            Connection.close();
+
+            return "0";
+        }
+    }
+
+    
 
     async Send_Score_to_leader_board(incoming_id, incoming_leaderboard_name, incoming_Score) {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
@@ -1230,7 +1270,7 @@ class Server_manager {
     async Control_time() {
         var sleep = (a) => { return new Promise(res => setTimeout(res, a)); }
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true,useUnifiedTopology:true}).connect();
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var list = await Connection.db("Chilligames_Servers").listCollections().toArray();
 
         while (true) {
