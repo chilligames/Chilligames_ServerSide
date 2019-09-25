@@ -58,6 +58,17 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "SRE": {
+            DB.Submit_recovery_email(Key, Email).then((result) => {
+                res.send(result);
+                res.end();
+            });
+        } break;
+        case "CP": {
+            DB.Change_password(Email, Password).then(() => {
+                res.end();
+            });
+        } break;
         case "SSTLB": {
 
             DB.Send_Score_to_leader_board(_id, leader_board_name, Score).then(() => {
@@ -462,10 +473,10 @@ class DB_model {
         if (finder != null) {
 
             var min = 5;
-            var max =9 ;
-            var code_reset =Math.random() * max * max +min+min;
+            var max = 9;
+            var code_reset = Math.random() * max * max + min + min;
 
-            await Connection.db("Chilligames").collection("Users").updateOne({ 'Info.Email': Incoming_email }, { $set: { 'Info.Reset_code': String(code_reset) }});
+            await Connection.db("Chilligames").collection("Users").updateOne({ 'Info.Email': Incoming_email }, { $set: { 'Info.Reset_code': String(code_reset) } });
 
             var transform = nodemailer.createTransport({
                 host: 'chilligames.ir',
@@ -481,7 +492,7 @@ class DB_model {
                 from: 'dontreplay@chilligames.ir',
                 to: Incoming_email,
                 subject: 'Account recovery',
-                text: 'Account recovery \n Hello \n This email is to restore your account and do not respond to it.\n Use this code to recover your account:\n '+code_reset
+                text: 'Account recovery \n Hello \n This email is to restore your account and do not respond to it.\n Use this code to recover your account:\n ' + code_reset + '\n\n\n If you didnt submit this request, ignore this email \n\n\n [Chilligames Team]'
             }
 
             transform.sendMail(mail_detail);
@@ -495,7 +506,27 @@ class DB_model {
         }
     }
 
-    
+
+    async Submit_recovery_email(Incoming_key, Incoming_email) {
+        var Connections = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+        var User = await Connections.db("Chilligames").collection("Users").findOne({ 'Info.Email': Incoming_email });
+
+        if (User.Info.Reset_code == Incoming_key) {
+            Connections.close();
+            return "1";
+
+        } else {
+            Connections.close();
+            return "0";
+        }
+    }
+
+
+    async Change_password(Incoming_Email,Incoming_password) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, {useNewUrlParser:true,useUnifiedTopology:true}).connect();
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ 'Info.Email': Incoming_Email }, { $set: {'Info.Password':Incoming_password}});
+        Connection.close();
+    }
 
     async Send_Score_to_leader_board(incoming_id, incoming_leaderboard_name, incoming_Score) {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
