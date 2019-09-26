@@ -2,6 +2,7 @@
 var app_api = Express();
 var nodemailer = require('nodemailer');
 
+
 app_api.get("/APIs", (req, res) => {
     var DB = new DB_model();
     var pipe_line = req.header("Pipe_line");
@@ -527,6 +528,7 @@ class DB_model {
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ 'Info.Email': Incoming_Email }, { $set: {'Info.Password':Incoming_password}});
         Connection.close();
     }
+
 
     async Send_Score_to_leader_board(incoming_id, incoming_leaderboard_name, incoming_Score) {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
@@ -1127,6 +1129,11 @@ class DB_model {
 
     }
 
+
+    async Cheack_new_message(Incomig_id) {
+       
+
+    }
 
     async Recive_notifactions(Incoming_id, Incoming_name_App) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
