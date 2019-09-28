@@ -1139,17 +1139,19 @@ class DB_model {
     async Cheack_new_message(Incomig_id) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomig_id) });
+        var result;
 
-        for (var i = 0; i < User.Message.length; i++) {
+        for (var i = 0; i < User.Notifactions.Message.length; i++) {
 
             if (User.Notifactions.Message[i].Status != 0) {
-                Connection.close();
-                return "1";
+                result = "1";
+                break;
             } else {
-                Connection.close();
-                return "0"
+                result = "0";
             }
         }
+        Connection.close();
+        return result;
     }
 
     async Recive_notifactions(Incoming_id, Incoming_name_App) {
