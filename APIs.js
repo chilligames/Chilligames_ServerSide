@@ -182,6 +182,11 @@ app_api.get("/APIs", (req, res) => {
             });
 
         } break;
+        case "MAAR": {
+            DB.Mark_all_as_read(_id).then(() => {
+                res.end();
+            });
+        } break;
         case "CNM": {
 
             DB.Cheack_new_message(_id).then((result) => {
@@ -1152,6 +1157,20 @@ class DB_model {
         }
         Connection.close();
         return result;
+    }
+
+
+    async Mark_all_as_read(Incoming_id) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+        var User =await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
+
+        for (var i = 0; i < User.Notifactions.Message.length; i++) {
+
+            User.Notifactions.Message[i].Status = 0;
+        }
+        await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { 'Notifactions.Message': User.Notifactions.Message }});
+
+        Connection.close();
     }
 
     async Recive_notifactions(Incoming_id, Incoming_name_App) {
