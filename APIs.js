@@ -1147,10 +1147,12 @@ class DB_model {
         for (var i = 0; i < this.Raw_Model_User.Notifactions.Message.length; i++) {
 
             if (this.Raw_Model_User.Notifactions.Message[i].Status != 0) {
-                return "1";
                 Connection.close();
+                return "1";
             } else {
+                Connection.close();
                 return "0"
+                
             }
         }
     }
