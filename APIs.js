@@ -139,9 +139,7 @@ app_api.get("/APIs", (req, res) => {
         case "UUI": {
 
             DB.Update_User_Info(_id, Nickname, Username, Email, Password, Status).then(() => {
-
                 res.end();
-
             });
         } break;
         case "CNN": {
@@ -166,9 +164,7 @@ app_api.get("/APIs", (req, res) => {
         case "SFR": {
 
             DB.Send_friend_requst(_id, _id_other_player).then(() => {
-
                 res.end();
-
             });
         } break;
         case "CFR": {
@@ -1142,17 +1138,16 @@ class DB_model {
 
     async Cheack_new_message(Incomig_id) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomig_id) });
-        
-        for (var i = 0; i < this.Raw_Model_User.Notifactions.Message.length; i++) {
+        var User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomig_id) });
 
-            if (this.Raw_Model_User.Notifactions.Message[i].Status != 0) {
+        for (var i = 0; i < User.Message.length; i++) {
+
+            if (User.Notifactions.Message[i].Status != 0) {
                 Connection.close();
                 return "1";
             } else {
                 Connection.close();
                 return "0"
-                
             }
         }
     }
