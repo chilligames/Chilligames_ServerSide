@@ -186,6 +186,13 @@ app_api.get("/APIs", (req, res) => {
             });
 
         } break;
+        case "CNM": {
+
+            DB.Cheack_new_message(_id).then((result) => {
+                res.send(result);
+                res.end();
+            });
+        } break;
         case "CS": {
             DB.Creat_server(_id, Name_App, Setting_server).then(() => {
                 res.end();
@@ -230,6 +237,9 @@ app_api.get("/APIs", (req, res) => {
             DB.Send_message_to_chatroom(_id, Name_App, Message).then(() => {
                 res.end();
             });
+        } break;
+        case "": {
+
         } break;
         case "RCM": {
             DB.Recive_Chatroom_Messages(Name_App).then((Result) => {
@@ -523,9 +533,9 @@ class DB_model {
     }
 
 
-    async Change_password(Incoming_Email,Incoming_password) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, {useNewUrlParser:true,useUnifiedTopology:true}).connect();
-        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ 'Info.Email': Incoming_Email }, { $set: {'Info.Password':Incoming_password}});
+    async Change_password(Incoming_Email, Incoming_password) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ 'Info.Email': Incoming_Email }, { $set: { 'Info.Password': Incoming_password } });
         Connection.close();
     }
 
@@ -1131,8 +1141,18 @@ class DB_model {
 
 
     async Cheack_new_message(Incomig_id) {
-       
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomig_id) });
+        
+        for (var i = 0; i < this.Raw_Model_User.Notifactions.Message.length; i++) {
 
+            if (this.Raw_Model_User.Notifactions.Message[i].Status != 0) {
+                return "1";
+                Connection.close();
+            } else {
+                return "0"
+            }
+        }
     }
 
     async Recive_notifactions(Incoming_id, Incoming_name_App) {
