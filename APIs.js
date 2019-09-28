@@ -182,8 +182,8 @@ app_api.get("/APIs", (req, res) => {
             });
 
         } break;
-        case "MAAR": {
-            DB.Mark_all_as_read(_id).then(() => {
+        case "MAMAR": {
+            DB.Mark_all_messages_as_read(_id).then(() => {
                 res.end();
             });
         } break;
@@ -1160,7 +1160,7 @@ class DB_model {
     }
 
 
-    async Mark_all_as_read(Incoming_id) {
+    async Mark_all_messages_as_read(Incoming_id) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var User =await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
 
