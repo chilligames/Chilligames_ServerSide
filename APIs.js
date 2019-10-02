@@ -1361,9 +1361,9 @@ class DB_model {
 
         }, (err, info) => {
             if (err) {
-                console.log(err.message);
+                a.close()
             } else {
-                console.log(info);
+                a.close();
             }
         });
     }
