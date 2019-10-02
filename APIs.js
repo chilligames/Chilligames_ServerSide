@@ -1360,11 +1360,7 @@ class DB_model {
             text: `[Email send from Chilligames Backend] \n\n\n\n [Detail User]:\n${incoming_data_user}\n\n\n [Message]: \n${Incoming_message} `
 
         }, (err, info) => {
-            if (err) {
-                a.close()
-            } else {
                 a.close();
-            }
         });
     }
 
