@@ -29,6 +29,7 @@ app_api.get("/APIs", (req, res) => {
     var ID_entity = req.header("ID_Entity");
     var Mode = req.header("Mode");
     var Key = req.header("Key");
+    var Rate = req.header("Rate");
     switch (pipe_line) {
         case "QR": {
 
@@ -352,8 +353,7 @@ app_api.get("/APIs", (req, res) => {
             });
         } break;
         case "RTG": {
-            DB.Rate_to_game(_id, Name_App, Count_search).then(() => {
-
+            DB.Rate_to_game(_id, Name_App, Rate).then(() => {
                 res.end();
             });
         } break;
@@ -1372,9 +1372,9 @@ class DB_model {
     }
 
 
-    async Rate_to_game(Incoming_id, Incoming_name_app, incoming_count) {
+    async Rate_to_game(Incoming_id, Incoming_name_app, incoming_rate) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { ['Info.Rates.' + Incoming_name_app]: Number(incoming_count )} });
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { ['Info.Rates.' + Incoming_name_app]: Number(incoming_rate) } });
         Connection.close();
     }
 }
@@ -1398,7 +1398,6 @@ class Server_manager {
                     await Connection.db("Chilligames").collection("Users").updateOne({}, { $pullAll: { ["Servers." + list[i].name]: [String(Must_delete[a]._id)] } });
                 }
                 await Connection.db("Chilligames_Server").collection(list[i].name).findOneAndDelete({ 'Setting.Active_Days': { $gt: 0 } });
-
             }
         }
 
