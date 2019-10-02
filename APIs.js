@@ -239,9 +239,6 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
-        case "": {
-
-        } break;
         case "RCM": {
             DB.Recive_Chatroom_Messages(Name_App).then((Result) => {
                 res.send(Result);
@@ -346,6 +343,11 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "RAOM": {
             DB.Remove_All_offer_match(Name_App, ID_entity).then(() => {
+                res.end();
+            });
+        } break;
+        case "CU": {
+            DB.Contact_Us(Name_App, Email, Message, Data_user).then(() => {
                 res.end();
             });
         } break;
@@ -1162,16 +1164,17 @@ class DB_model {
 
     async Mark_all_messages_as_read(Incoming_id) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-        var User =await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
+        var User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
 
         for (var i = 0; i < User.Notifactions.Message.length; i++) {
 
             User.Notifactions.Message[i].Status = 0;
         }
-        await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { 'Notifactions.Message': User.Notifactions.Message }});
+        await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { 'Notifactions.Message': User.Notifactions.Message } });
 
         Connection.close();
     }
+
 
     async Recive_notifactions(Incoming_id, Incoming_name_App) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
@@ -1336,6 +1339,33 @@ class DB_model {
             Connection.close();
         }
 
+    }
+
+
+    async Contact_Us(incoming_nameapp, incoming_Email_admin, Incoming_message, incoming_data_user, ) {
+        var a = nodemailer.createTransport({
+            host: 'chilligames.ir',
+            auth: {
+                user: 'dontreplay@chilligames.ir',
+                pass: '85245685hHH!'
+            },
+            secure: true,
+            port: 465
+        });
+
+        a.sendMail({
+            from: 'dontreplay@chilligames.ir',
+            to: incoming_Email_admin,
+            subject: `[Contact you][Game:${incoming_nameapp}]`,
+            text: `[Email send from Chilligames Backend] \n\n\n\n [Detail User]:\n${incoming_data_user}\n\n\n [Message]: \n${Incoming_message} `
+
+        }, (err, info) => {
+            if (err) {
+                console.log(err.message);
+            } else {
+                console.log(info);
+            }
+        });
     }
 
 }
