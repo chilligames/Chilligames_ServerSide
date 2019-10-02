@@ -351,6 +351,12 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "RTG": {
+            DB.Rate_to_game(_id, Name_App, Count_search).then(() => {
+
+                res.end();
+            });
+        } break;
 
 
     }
@@ -370,7 +376,8 @@ class DB_model {
             'Email': '',
             'Nickname': '',
             'Status': '',
-            'Reset_code': ""
+            'Reset_code': "",
+            'Rates': {}
         },
         "Ban": [],
         "Friends": [],
@@ -1360,10 +1367,16 @@ class DB_model {
             text: `[Email send from Chilligames Backend] \n\n\n\n [Detail User]:\n${incoming_data_user}\n\n\n [Message]: \n${Incoming_message} `
 
         }, (err, info) => {
-                a.close();
+            a.close();
         });
     }
 
+
+    async Rate_to_game(Incoming_id, Incoming_name_app, incoming_count) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { ['Info.Rates.' + Incoming_name_app]: Number(incoming_count )} });
+        Connection.close();
+    }
 }
 
 
