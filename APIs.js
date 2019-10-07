@@ -978,9 +978,13 @@ class DB_model {
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(Incoming_ID) });
 
         var position = await Connection.db("Chilligames_Chat").collection(Incoming_name_app).find({}, { sort: { 'Position': -1 } }).toArray();
+        if (position == undefined) {
+            this.Raw_model_messegae_chatroom.Position = 0
+        } else {
 
-        
-        this.Raw_model_messegae_chatroom.Position = position[0].Position + 1;
+            this.Raw_model_messegae_chatroom.Position = position[0].Position + 1;
+        }
+
 
         this.Raw_model_messegae_chatroom.ID = Incoming_ID;
         this.Raw_model_messegae_chatroom.Nick_Name = this.Raw_Model_User.Info.Nickname;
