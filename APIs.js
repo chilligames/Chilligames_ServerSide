@@ -1282,14 +1282,13 @@ class DB_model {
 
 
     async Recive_offers(Incoming_id, Incoming_name_app) {
+
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-        var result = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { projection: { ['Wallet.Offers.' + Incoming_name_app]: 1 } }).catch(function (result) {
+        var result = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { projection: { ['Wallet.Offers.' + Incoming_name_app]: 1 } });
 
-            console.log("Err");
+        if (result.Wallet.Offers[Incoming_name_app] == undefined) {
 
-        });
-
-        if (result == undefined) {
+            console.log("not find");
             Connection.close();
 
         } else {
