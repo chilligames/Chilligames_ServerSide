@@ -1284,8 +1284,15 @@ class DB_model {
     async Recive_offers(Incoming_id, Incoming_name_app) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var result = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { projection: { ['Wallet.Offers.' + Incoming_name_app]: 1 } });
-        Connection.close();
-        return result.Wallet.Offers[Incoming_name_app];
+
+        if (result == undefined) {
+            Connection.close();
+            
+        } else {
+
+            Connection.close();
+            return result.Wallet.Offers[Incoming_name_app];
+        }
     }
 
 
