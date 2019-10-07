@@ -931,7 +931,7 @@ class DB_model {
 
                 if (_id_profile == Incoming_id_server) {
                     Connection.close();
-                    return 1;
+                    result= 1;
                 }
             }
         } catch (e) {
@@ -939,11 +939,11 @@ class DB_model {
 
             if (result == 0) {
                 Connection.close();
-                return 0;
+                result= 0;
             }
 
         }
-
+        return result;
 
     }
 
