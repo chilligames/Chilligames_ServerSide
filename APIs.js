@@ -225,9 +225,6 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "CSIP": {
             DB.Cheack_server_in_profile(_id, Name_App, _id_server).then((result) => {
-
-                console.log(result);
-                
                 var Result_to_string = String(result);
                 res.send(Result_to_string);
 
@@ -941,7 +938,6 @@ class DB_model {
                 Connection.close();
                 result= 0;
             }
-
         }
         return result;
 
