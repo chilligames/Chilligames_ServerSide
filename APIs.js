@@ -2,7 +2,7 @@
 var app_api = Express();
 var nodemailer = require('nodemailer');
 
-//hi test for server config
+//hi test for 
 app_api.get("/APIs", (req, res) => {
     var DB = new DB_model();
     var pipe_line = req.header("Pipe_line");
