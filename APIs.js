@@ -225,7 +225,8 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "CSIP": {
             DB.Cheack_server_in_profile(_id, Name_App, _id_server).then((result) => {
-                res.send(result.toString());
+                var res = new String(result);
+                res.send(res);
                 res.end();
             });
         } break;
@@ -396,7 +397,7 @@ class DB_model {
             "Money": 0.0,
             "Offrers": {}
         },
-        "Servers": [],
+        "Servers": {},
         "Leader_board": {}
     }
 
@@ -949,6 +950,7 @@ class DB_model {
         var _id = new mongo_raw.ObjectID(Incomng_ID);
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+
         this.Raw_Model_User.Servers[Incoming_name_app].push(Incoming_id_server);
 
         await Connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { 'Servers': this.Raw_Model_User.Servers } });
