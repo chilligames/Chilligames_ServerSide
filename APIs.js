@@ -225,8 +225,11 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "CSIP": {
             DB.Cheack_server_in_profile(_id, Name_App, _id_server).then((result) => {
+
                 var Result_to_string = new String(result);
+                console.log(Result_to_string);
                 res.send(Result_to_string);
+
                 res.end();
             });
         } break;
