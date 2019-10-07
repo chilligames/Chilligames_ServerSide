@@ -920,20 +920,25 @@ class DB_model {
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
         var result = 0;
+        try {
 
-        for (var _id_profile of this.Raw_Model_User.Servers[Incoming_name_app]) {
+            for (var _id_profile of this.Raw_Model_User.Servers[Incoming_name_app]) {
 
-            if (_id_profile == Incoming_id_server) {
-                Connection.close();
-                return 1;
+                if (_id_profile == Incoming_id_server) {
+                    Connection.close();
+                    return 1;
+                }
             }
+        } catch (e) {
+
+
+            if (result == 0) {
+                Connection.close();
+                return 0;
+            }
+
         }
 
-        if (result == 0) {
-            Connection.close();
-
-            return 0;
-        }
 
     }
 
