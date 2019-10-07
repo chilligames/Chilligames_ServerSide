@@ -1285,12 +1285,12 @@ class DB_model {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var result;
-        Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { projection: { ['Wallet.Offers.' + Incoming_name_app]: 1 } }).then(res => {
+       await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { projection: { ['Wallet.Offers.' + Incoming_name_app]: 1 } }).then(res => {
 
             try {
 
-                result = res;
-
+                result = res.Wallet.Offers[Incoming_name_app];
+                console.log("read");
             } catch (e) {
                 Connection.close();
                 console.log("catch");
