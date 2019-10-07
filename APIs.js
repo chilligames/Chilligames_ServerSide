@@ -2,7 +2,7 @@
 var app_api = Express();
 var nodemailer = require('nodemailer');
 
-//hi test for 
+
 app_api.get("/APIs", (req, res) => {
     var DB = new DB_model();
     var pipe_line = req.header("Pipe_line");
@@ -424,7 +424,7 @@ class DB_model {
 
 
     Raw_model_messegae_chatroom = {
-        'Postion': '',
+        'Position': '',
         'ID': '',
         'Nick_Name': '',
         'Message': '',
@@ -977,10 +977,10 @@ class DB_model {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(Incoming_ID) });
 
-        var postion = await Connection.db("Chilligames_Chat").collection(Incoming_name_app).find({}, { sort: { 'Postion': -1 } }).toArray();
+        var position = await Connection.db("Chilligames_Chat").collection(Incoming_name_app).find({}, { sort: { 'Position': -1 } }).toArray();
 
-
-        this.Raw_model_messegae_chatroom.Postion = postion[0].Postion + 1;
+        
+        this.Raw_model_messegae_chatroom.Position = position[0].Position + 1;
 
         this.Raw_model_messegae_chatroom.ID = Incoming_ID;
         this.Raw_model_messegae_chatroom.Nick_Name = this.Raw_Model_User.Info.Nickname;
@@ -999,7 +999,7 @@ class DB_model {
         var Connections = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var Count_call_back = await Connections.db("Chilligames_Chat").collection(Incoming_Name_App).countDocuments() - 10;
 
-        var result_find = await Connections.db("Chilligames_Chat").collection(Incoming_Name_App).find({ 'Postion': { $gte: Count_call_back } }, { sort: { 'Postion': 1 } }).toArray();
+        var result_find = await Connections.db("Chilligames_Chat").collection(Incoming_Name_App).find({ 'Position': { $gte: Count_call_back } }, { sort: { 'Position': 1 } }).toArray();
         Connections.close();
         return result_find;
     }
