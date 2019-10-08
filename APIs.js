@@ -30,6 +30,7 @@ app_api.get("/APIs", (req, res) => {
     var Mode = req.header("Mode");
     var Key = req.header("Key");
     var Rate = req.header("Rate");
+
     switch (pipe_line) {
         case "QR": {
 
@@ -171,6 +172,14 @@ app_api.get("/APIs", (req, res) => {
         case "CFR": {
             DB.Cancel_friend_requst(_id, _id_other_player).then(() => {
                 res.end();
+            });
+
+        } break;
+        case "RLF": {
+            DB.Recive_list_friend(_id).then((result) => {
+                res.send(result);
+                res.end();
+
             });
 
         } break;
@@ -780,6 +789,7 @@ class DB_model {
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $push: { "Friends": this.Raw_model_Friend } });
 
         console.log("send notifaction to other player for alarm send req");
+
         Connection.close();
     }
 
@@ -811,6 +821,13 @@ class DB_model {
         Connection.close();
     }
 
+
+    async Recive_list_friend(Incoming_id) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+        var list_freind = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { projection: { 'Friends': 1 } });
+        Connection.close();
+        return list_freind;
+    }
 
     async Creat_server(Incoming_id, Incoming_name_app, Incoming_Setting_server) {
 
