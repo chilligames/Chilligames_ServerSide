@@ -788,10 +788,13 @@ class DB_model {
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $push: { "Friends": this.Raw_model_Friend } });
 
 
-        this.Raw_model_Friend.ID = Incoming_id;
-        this.Raw_model_Friend = 1;
+        var model_friend = {
+            'ID': Incoming_id_other_player,
+            Status:1;
 
-        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $push: { "Friends": this.Raw_model_Friend } });
+        }
+
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $push: { "Friends": model_friend} });
 
 
         Connection.close();
