@@ -790,7 +790,7 @@ class DB_model {
 
         var model_friend = {
             'ID': Incoming_id_other_player,
-            Status:1;
+            Status:1
 
         }
 
