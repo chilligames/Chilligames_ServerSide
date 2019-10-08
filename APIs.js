@@ -787,6 +787,7 @@ class DB_model {
 
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $push: { "Friends": this.Raw_model_Friend } });
 
+
         this.Raw_model_Friend.ID = Incoming_id;
         this.Raw_model_Friend = 1;
 
