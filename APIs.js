@@ -928,7 +928,7 @@ class DB_model {
 
                 if (_id_profile == Incoming_id_server) {
                     Connection.close();
-                    result= 1;
+                    result = 1;
                 }
             }
         } catch (e) {
@@ -936,7 +936,7 @@ class DB_model {
 
             if (result == 0) {
                 Connection.close();
-                result= 0;
+                result = 0;
             }
         }
         return result;
@@ -951,10 +951,19 @@ class DB_model {
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
 
-        this.Raw_Model_User.Servers[Incoming_name_app].push(Incoming_id_server);
+        try {
+
+            this.Raw_Model_User.Servers[Incoming_name_app].push(Incoming_id_server);
+
+        } catch (e) {
+
+            this.Raw_Model_User.Servers[Incoming_name_app] = [];
+            this.Raw_Model_User.Servers[Incoming_name_app].push(Incoming_id_server);
+        }
 
         await Connection.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { 'Servers': this.Raw_Model_User.Servers } });
         Connection.close();
+
     }
 
 
