@@ -776,19 +776,22 @@ class DB_model {
         return result;
     }
 
-
+    //last change
     async Send_friend_requst(Incoming_id, Incoming_id_other_player) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
 
-        var _id = new mongo_raw.ObjectId(Incoming_id);
 
         this.Raw_model_Friend.ID = Incoming_id_other_player;
-        this.Raw_model_Friend.Status = 1;
+        this.Raw_model_Friend.Status = 0;
 
-        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $push: { "Friends": this.Raw_model_Friend } });
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $push: { "Friends": this.Raw_model_Friend } });
 
-        console.log("send notifaction to other player for alarm send req");
+        this.Raw_model_Friend.ID = Incoming_id;
+        this.Raw_model_Friend = 1;
+
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $push: { "Friends": this.Raw_model_Friend } });
+
 
         Connection.close();
     }
@@ -817,6 +820,8 @@ class DB_model {
         }
 
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Friends': new_friend } });
+
+        console.log("Code cancel for tow player here");
 
         Connection.close();
     }
