@@ -183,6 +183,12 @@ app_api.get("/APIs", (req, res) => {
             });
 
         } break;
+        case "AFR": {
+            DB.accept_friend_req(_id, _id_other_player).then(() => {
+
+                res.end();
+            });
+        } break;
         case "SMTU": {
 
             DB.Send_messege_to_users(_id, _id_other_player, Message).then(() => {
@@ -776,7 +782,7 @@ class DB_model {
         return result;
     }
 
-    //last change
+
     async Send_friend_requst(Incoming_id, Incoming_id_other_player) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
@@ -793,6 +799,34 @@ class DB_model {
 
         }
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $push: { "Friends": model_friend } });
+
+        Connection.close();
+    }
+
+
+    async accept_friend_req(Incoming_id, Incoming_Id_other_player) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(Incoming_id) });
+
+        for (let items in this.Raw_Model_User.Friends) {
+
+            if (this.Raw_Model_User.Friends[items].ID == Incoming_Id_other_player) {
+
+                this.Raw_Model_User.Friends[items].Status = 2;
+            }
+        }
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectID(Incoming_id) }, { $set: { 'Friends': this.Raw_Model_User.Friends } });
+
+
+        var otherplayer = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(Incoming_Id_other_player) });
+
+        for (let item in otherplayer.Friends) {
+            if (otherplayer.Friends[item].ID==Incoming_id) {
+                otherplayer.Friends[item].Status = 2;
+            }
+        }
+
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_Id_other_player) }, { $set: {'Friends':otherplayer.Friends}});
 
         Connection.close();
     }
@@ -836,7 +870,7 @@ class DB_model {
             }
         }
 
-        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $set: { 'Friends': new_friend_other_user }});
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $set: { 'Friends': new_friend_other_user } });
 
         Connection.close();
     }
@@ -848,6 +882,7 @@ class DB_model {
         Connection.close();
         return list_freind;
     }
+
 
     async Creat_server(Incoming_id, Incoming_name_app, Incoming_Setting_server) {
 
