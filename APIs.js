@@ -803,7 +803,7 @@ class DB_model {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
 
-        for (var postion in this.Raw_Model_User.Friends) {
+        for (let postion in this.Raw_Model_User.Friends) {
             if (this.Raw_Model_User.Friends[postion].ID == Incoming_id_other_player) {
 
                 delete this.Raw_Model_User.Friends[postion];
@@ -811,7 +811,7 @@ class DB_model {
 
         }
         var new_friend = [];
-        for (var pos_fill in this.Raw_Model_User.Friends) {
+        for (let pos_fill in this.Raw_Model_User.Friends) {
 
             if (this.Raw_Model_User.Friends[pos_fill] != null) {
 
@@ -823,14 +823,14 @@ class DB_model {
 
 
         var OtherUser = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) });
-        for (var postion in OtherUser.Friends) {
+        for (let postion in OtherUser.Friends) {
 
             if (OtherUser.Friends[postion].ID == Incoming_id) {
                 delete OtherUser.Friends[postion];
             }
         }
         var new_friend_other_user = [];
-        for (var pos_fill in OtherUser.Friends) {
+        for (let pos_fill in OtherUser.Friends) {
             if (OtherUser.Friends[pos_fill] != null) {
                 new_friend_other_user.push(OtherUser[pos_fill]);
             }
