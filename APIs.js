@@ -784,18 +784,15 @@ class DB_model {
 
         this.Raw_model_Friend.ID = Incoming_id_other_player;
         this.Raw_model_Friend.Status = 0;
-
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $push: { "Friends": this.Raw_model_Friend } });
 
 
         var model_friend = {
             'ID': Incoming_id,
-            Status:1
+            Status: 1
 
         }
-
-        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $push: { "Friends": model_friend} });
-
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $push: { "Friends": model_friend } });
 
         Connection.close();
     }
@@ -804,8 +801,7 @@ class DB_model {
     async Cancel_friend_requst(Incoming_id, Incoming_id_other_player) {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-        var _id = new mongo_raw.ObjectID(Incoming_id);
-        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
 
         for (var postion in this.Raw_Model_User.Friends) {
             if (this.Raw_Model_User.Friends[postion].ID == Incoming_id_other_player) {
@@ -822,10 +818,25 @@ class DB_model {
                 new_friend.push(this.Raw_Model_User.Friends[pos_fill]);
             }
         }
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { 'Friends': new_friend } });
 
-        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': _id }, { $set: { 'Friends': new_friend } });
 
-        console.log("Code cancel for tow player here");
+
+        var OtherUser = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) });
+        for (var postion in OtherUser.Friends) {
+
+            if (OtherUser.Friends[postion].ID == Incoming_id) {
+                delete OtherUser.Friends[postion];
+            }
+        }
+        var new_friend_other_user = [];
+        for (var pos_fill in OtherUser.Friends) {
+            if (OtherUser.Friends[pos_fill] != null) {
+                new_friend_other_user.push(OtherUser[pos_fill]);
+            }
+        }
+
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { 'Friends': new_friend_other_user });
 
         Connection.close();
     }
