@@ -836,7 +836,7 @@ class DB_model {
             }
         }
 
-        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { 'Friends': new_friend_other_user });
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $set: { 'Friends': new_friend_other_user }});
 
         Connection.close();
     }
