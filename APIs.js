@@ -1458,7 +1458,7 @@ class DB_model {
     }
 
 
-    async Contact_Us(incoming_nameapp, incoming_Email_admin, Incoming_message, incoming_data_user, incoming_Key) {
+    async Contact_Us(incoming_nameapp, incoming_Email_admin, Incoming_message, incoming_data_user) {
         var Creator = nodemailer.createTransport({
             host: 'chilligames.ir',
             auth: {
@@ -1473,7 +1473,7 @@ class DB_model {
             from: 'dontreplay@chilligames.ir',
             to: incoming_Email_admin,
             subject: `[Contact you][Game:${incoming_nameapp}]`,
-            text: `[Email send from Chilligames Backend] \n\n\n\n [Detail User]:\n${incoming_data_user}\n\n\n [Key]:\n${incoming_Key}\n\n\n [Message]: \n${Incoming_message} `
+            text: `[Email send from Chilligames Backend] \n\n\n\n [Detail User]:\n${incoming_data_user}\n\n\n [Message]: \n${Incoming_message} `
         }, (err, info) => {
 
             Creator.close();
@@ -1481,9 +1481,8 @@ class DB_model {
         Creator.close();
     }
 
-    async BUG_report(incomin_name_app, incoming_email_admin, incoming_message, Incoming_data_user) {
+    async BUG_report(incomin_name_app, incoming_email_admin, incoming_message, Incoming_data_user, Incoming_key) {
 
-        console.log('change');
         var creator = nodemailer.createTransport({
             host: 'chilligames.ir',
             auth: {
@@ -1498,12 +1497,11 @@ class DB_model {
                 from: 'dontreplay@chilligames.ir',
                 to: incoming_email_admin,
                 subject: `[Report BUG][Game:${incomin_name_app}]`,
-                text: `[Email Send from Chilligames Backend]\n\n\n\ [Detail User]:\n ${Incoming_data_user}\n\n [Report]:\n ${incoming_message}`
-
+                text: `[Email Send from Chilligames Backend]\n\n\n\ [Detail User]:\n ${Incoming_data_user}\n\n\n [Key]:\n ${Incoming_key}\n\n\n[Report]:\n ${incoming_message}`
             }, (err, info) => {
 
                 creator.close();
-        });
+            });
 
         creator.close();
     }
