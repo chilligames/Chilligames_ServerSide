@@ -821,12 +821,12 @@ class DB_model {
         var otherplayer = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(Incoming_Id_other_player) });
 
         for (let item in otherplayer.Friends) {
-            if (otherplayer.Friends[item].ID==Incoming_id) {
+            if (otherplayer.Friends[item].ID == Incoming_id) {
                 otherplayer.Friends[item].Status = 2;
             }
         }
 
-        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_Id_other_player) }, { $set: {'Friends':otherplayer.Friends}});
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_Id_other_player) }, { $set: { 'Friends': otherplayer.Friends } });
 
         Connection.close();
     }
@@ -1454,7 +1454,7 @@ class DB_model {
 
 
     async Contact_Us(incoming_nameapp, incoming_Email_admin, Incoming_message, incoming_data_user, ) {
-        var a = nodemailer.createTransport({
+        var Creator = nodemailer.createTransport({
             host: 'chilligames.ir',
             auth: {
                 user: 'dontreplay@chilligames.ir',
@@ -1464,15 +1464,17 @@ class DB_model {
             port: 465
         });
 
-        a.sendMail({
+        Creator.sendMail({
             from: 'dontreplay@chilligames.ir',
             to: incoming_Email_admin,
             subject: `[Contact you][Game:${incoming_nameapp}]`,
             text: `[Email send from Chilligames Backend] \n\n\n\n [Detail User]:\n${incoming_data_user}\n\n\n [Message]: \n${Incoming_message} `
 
         }, (err, info) => {
-            a.close();
+
+            Creator.close();
         });
+        Creator.close();
     }
 
 
@@ -1480,6 +1482,31 @@ class DB_model {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { ['Info.Rates.' + Incoming_name_app]: Number(incoming_rate) } });
         Connection.close();
+    }
+
+    async BUG_report(incomin_name_app, incoming_email_admin, incoming_message, Incoming_data_user) {
+
+        var creator = nodemailer.createTransport({
+            host: 'chilligames.ir',
+            auth: {
+                user: 'dontreplay@chilligames.ir',
+                pass: '85245685hHH!'
+            },
+            secure: true,
+            port: 465
+        });
+        creator.sendMail(
+            {
+                from: 'dontreplay@chilligames.ir',
+                to: incoming_email_admin,
+                subject: `[Report BUG][Game:${incomin_name_app}]`,
+                text: `[Email Send from Chilligames Backend]\n\n\n\ [Detail User]:\n ${Incoming_data_user}\n\n [Report]:\n ${incoming_message}`
+
+            }, (err, info) => {
+
+                creator.close();
+            });
+        creator.close();
     }
 }
 
