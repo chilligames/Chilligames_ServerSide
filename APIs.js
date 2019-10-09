@@ -374,7 +374,11 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
-
+        case "Br": {
+            DB.BUG_report(Name_App, Email, Message, Data_user).then(() => {
+                res.end();
+            });
+        } break;
 
     }
 }).listen("3333", "0.0.0.0")
@@ -1483,6 +1487,7 @@ class DB_model {
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { ['Info.Rates.' + Incoming_name_app]: Number(incoming_rate) } });
         Connection.close();
     }
+
 
     async BUG_report(incomin_name_app, incoming_email_admin, incoming_message, Incoming_data_user) {
 
