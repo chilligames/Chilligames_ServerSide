@@ -1524,9 +1524,9 @@ class Server_manager {
 
         while (true) {
             await sleep(2000);
-            var list = await Connection.db("Chilligames_Servers").listCollections().toArray();
 
             var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+            var list = await Connection.db("Chilligames_Servers").listCollections().toArray();
             for (var i = 0; i < list.length; i++) {
 
                 await Connection.db("Chilligames_Servers").collection(list[i].name).updateMany({}, { $inc: { 'Setting.Active_Days': 1 } });
