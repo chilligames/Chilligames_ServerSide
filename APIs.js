@@ -30,7 +30,7 @@ app_api.get("/APIs", (req, res) => {
     var Mode = req.header("Mode");
     var Key = req.header("Key");
     var Rate = req.header("Rate");
-    
+
 
     switch (pipe_line) {
         case "QR": {
@@ -375,8 +375,8 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
-        case "Br": {
-            DB.BUG_report(Name_App, Email, Message, Data_user,Key).then(() => {
+        case "BR": {
+            DB.BUG_report(Name_App, Email, Message, Data_user, Key).then(() => {
                 res.end();
             });
         } break;
@@ -1458,7 +1458,7 @@ class DB_model {
     }
 
 
-    async Contact_Us(incoming_nameapp, incoming_Email_admin, Incoming_message, incoming_data_user,incoming_Key ) {
+    async Contact_Us(incoming_nameapp, incoming_Email_admin, Incoming_message, incoming_data_user, incoming_Key) {
         var Creator = nodemailer.createTransport({
             host: 'chilligames.ir',
             auth: {
@@ -1478,18 +1478,12 @@ class DB_model {
 
             Creator.close();
         });
+        Creator.close();
     }
-
-
-    async Rate_to_game(Incoming_id, Incoming_name_app, incoming_rate) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { ['Info.Rates.' + Incoming_name_app]: Number(incoming_rate) } });
-        Connection.close();
-    }
-
 
     async BUG_report(incomin_name_app, incoming_email_admin, incoming_message, Incoming_data_user) {
 
+        console.log('change');
         var creator = nodemailer.createTransport({
             host: 'chilligames.ir',
             auth: {
@@ -1509,8 +1503,18 @@ class DB_model {
             }, (err, info) => {
 
                 creator.close();
-            });
+        });
+
+        creator.close();
     }
+
+    async Rate_to_game(Incoming_id, Incoming_name_app, incoming_rate) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+        await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { ['Info.Rates.' + Incoming_name_app]: Number(incoming_rate) } });
+        Connection.close();
+    }
+
+
 }
 
 
