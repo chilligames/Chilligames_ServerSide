@@ -30,6 +30,7 @@ app_api.get("/APIs", (req, res) => {
     var Mode = req.header("Mode");
     var Key = req.header("Key");
     var Rate = req.header("Rate");
+    
 
     switch (pipe_line) {
         case "QR": {
@@ -375,7 +376,7 @@ app_api.get("/APIs", (req, res) => {
             });
         } break;
         case "Br": {
-            DB.BUG_report(Name_App, Email, Message, Data_user).then(() => {
+            DB.BUG_report(Name_App, Email, Message, Data_user,Key).then(() => {
                 res.end();
             });
         } break;
@@ -1457,7 +1458,7 @@ class DB_model {
     }
 
 
-    async Contact_Us(incoming_nameapp, incoming_Email_admin, Incoming_message, incoming_data_user, ) {
+    async Contact_Us(incoming_nameapp, incoming_Email_admin, Incoming_message, incoming_data_user,incoming_Key ) {
         var Creator = nodemailer.createTransport({
             host: 'chilligames.ir',
             auth: {
@@ -1472,8 +1473,7 @@ class DB_model {
             from: 'dontreplay@chilligames.ir',
             to: incoming_Email_admin,
             subject: `[Contact you][Game:${incoming_nameapp}]`,
-            text: `[Email send from Chilligames Backend] \n\n\n\n [Detail User]:\n${incoming_data_user}\n\n\n [Message]: \n${Incoming_message} `
-
+            text: `[Email send from Chilligames Backend] \n\n\n\n [Detail User]:\n${incoming_data_user}\n\n\n [Key]:\n${incoming_Key}\n\n\n [Message]: \n${Incoming_message} `
         }, (err, info) => {
 
             Creator.close();
