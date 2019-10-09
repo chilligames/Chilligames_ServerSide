@@ -1478,7 +1478,6 @@ class DB_model {
 
             Creator.close();
         });
-        Creator.close();
     }
 
 
@@ -1511,7 +1510,6 @@ class DB_model {
 
                 creator.close();
             });
-        creator.close();
     }
 }
 
