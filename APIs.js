@@ -588,7 +588,7 @@ class DB_model {
         var Pipe_leader_board = "Leader_board." + incoming_name_leader_board;
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-        var result_search = await Connection.db("Chilligames").collection("Users").find({}, { limit: Number(incoming_count), projection: { [Pipe_leader_board]: -1} }).toArray();
+        var result_search = await Connection.db("Chilligames").collection("Users").find({}, { limit: Number(incoming_count), projection: { [Pipe_leader_board]: 1, 'Info.Nickname': 1 }, sort: { [Pipe_leader_board]: -1 } }).toArray();
         var result = [];
         for (var i = 0; i < result_search.length; i++) {
             result[i] = {
