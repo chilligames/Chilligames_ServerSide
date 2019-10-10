@@ -1481,6 +1481,7 @@ class DB_model {
         Creator.close();
     }
 
+
     async BUG_report(incomin_name_app, incoming_email_admin, incoming_message, Incoming_data_user, Incoming_key) {
 
         var creator = nodemailer.createTransport({
@@ -1506,6 +1507,7 @@ class DB_model {
         creator.close();
     }
 
+
     async Rate_to_game(Incoming_id, Incoming_name_app, incoming_rate) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { ['Info.Rates.' + Incoming_name_app]: Number(incoming_rate) } });
@@ -1520,10 +1522,8 @@ class Server_manager {
 
     async Control_time() {
         var sleep = (a) => { return new Promise(res => setTimeout(res, a)); }
-
-
+        
         while (true) {
-            await sleep(2000);
 
             var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
             var list = await Connection.db("Chilligames_Servers").listCollections().toArray();
@@ -1539,6 +1539,7 @@ class Server_manager {
             }
 
             Connection.close();
+            await sleep(2000);
         }
 
     }
