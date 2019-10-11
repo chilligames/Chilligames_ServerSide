@@ -500,9 +500,10 @@ class DB_model {
 
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var finder = await Connection.db("Chilligames").collection("Users").findOne({ 'Info.Username': Incoming_Username, 'Info.Password': Incoming_password });
+
         if (finder != null) {
             Connection.close();
-            return finder._id.toHexString();
+            return finder._id;
         } else {
             Connection.close();
             return "0";
