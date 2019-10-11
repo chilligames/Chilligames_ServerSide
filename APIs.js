@@ -482,17 +482,22 @@ class DB_model {
 
     async Quick_login(Incoming_id) {
 
-        var _id = new mongo_raw.ObjectId(Incoming_id);
+      
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-        var result_search = await Connection.db("Chilligames").collection("Users").findOne({ '_id': _id });
+
+        var result_search = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
+        var result;
+
         if (result_search != null) {
 
             Connection.close();
-            return "1";
+            result = "1";
         } else {
             Connection.close();
-            return "0";
+            result = "0";
         }
+
+        return result;
     }
 
 
