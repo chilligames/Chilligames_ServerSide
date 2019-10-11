@@ -481,11 +481,9 @@ class DB_model {
 
 
     async Quick_login(Incoming_id) {
-        console.log(Incoming_id.length);
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
 
         var result_search = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
-        console.log(result_search);
         var result;
 
         if (result_search != null) {
@@ -511,7 +509,7 @@ class DB_model {
             result = finder._id.toHexString();
         } else {
             Connection.close();
-            result= "0";
+            result = "0";
         }
         return result;
     }
@@ -1210,7 +1208,6 @@ class DB_model {
 
             if (status != 1) {
 
-                console.log("not fide");
                 await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $push: { 'Notifactions.Message': this.Raw_model_messages } });
             }
 
@@ -1529,7 +1526,7 @@ class Server_manager {
 
     async Control_time() {
         var sleep = (a) => { return new Promise(res => setTimeout(res, a)); }
-        
+
         while (true) {
 
             var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
