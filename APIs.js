@@ -481,11 +481,11 @@ class DB_model {
 
 
     async Quick_login(Incoming_id) {
-
-      
+        console.log(Incoming_id.length);
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
 
         var result_search = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
+        console.log(result_search);
         var result;
 
         if (result_search != null) {
