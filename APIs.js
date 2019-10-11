@@ -508,7 +508,7 @@ class DB_model {
         var result;
         if (finder != null) {
             Connection.close();
-            result = finder._id;
+            result = finder._id.toHexString();
         } else {
             Connection.close();
             result= "0";
