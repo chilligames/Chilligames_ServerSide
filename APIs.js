@@ -204,6 +204,11 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "DMU": {
+            DB.Delet_Message_Users(_id, _id_other_player).then(() => {
+                res.end();
+            });
+        } break;
         case "CNM": {
 
             DB.Cheack_new_message(_id).then((result) => {
@@ -1281,6 +1286,20 @@ class DB_model {
         await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { 'Notifactions.Message': User.Notifactions.Message } });
 
         Connection.close();
+    }
+
+
+    async Delet_Message_Users(Incoming_id, Incomin_id_other_player) {
+        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
+        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
+
+        for (var i = 0; i < this.Raw_Model_User.Notifactions.Message.length; i++) {
+            if (this.Raw_Model_User.Notifactions.Message[i].ID == Incomin_id_other_player) {
+                delete this.Raw_Model_User.Notifactions.Message[i];
+            }
+        }
+
+
     }
 
 
