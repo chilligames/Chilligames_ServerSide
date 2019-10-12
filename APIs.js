@@ -1293,13 +1293,27 @@ class DB_model {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
 
-        for (var i = 0; i < this.Raw_Model_User.Notifactions.Message.length; i++) {
+        for (let i = 0; i < this.Raw_Model_User.Notifactions.Message.length; i++) {
             if (this.Raw_Model_User.Notifactions.Message[i].ID == Incomin_id_other_player) {
                 delete this.Raw_Model_User.Notifactions.Message[i];
+                break;
             }
         }
 
+        var new_message = [];
 
+        for (let i = 0; i < this.Raw_Model_User.Notifactions.Message.length; i++) {
+
+            if (this.Raw_Model_User.Notifactions.Message[i] != undefined) {
+                new_message.push(this.Raw_Model_User.Notifactions.Message[i]);
+            }
+        }
+        this.Raw_Model_User.Notifactions.Message = new_message;
+
+        console.log(this.Raw_Model_User.Notifactions.Message);
+        await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { 'Notifactions.Message': this.Raw_Model_User.Notifactions.Message } });
+
+        Connection.close();
     }
 
 
