@@ -416,7 +416,7 @@ class DB_model {
         "Wallet": {
             "Coin": 0,
             "Money": 0.0,
-            "Offrers": {}
+            "Offers": {}
         },
         "Servers": {},
         "Leader_board": {}
