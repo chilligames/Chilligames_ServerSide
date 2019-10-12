@@ -785,7 +785,7 @@ class DB_model {
         });
 
         if (result == undefined) {
-            result = 3; //change 0->3
+            result = 3;
         }
 
         Connection.close();
@@ -1194,7 +1194,7 @@ class DB_model {
 
                     other_player.Notifactions.Message[i].Message.push(this.Raw_model_each_message);
                     other_player.Notifactions.Message[i].Last_Date = new Date().toUTCString();
-                    other_player.Notifactions.Message[i].Status = 0;
+                    other_player.Notifactions.Message[i].Status = 1; //change 0->1
 
                     await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id_other_player) }, { $set: { 'Notifactions.Message': other_player.Notifactions.Message } })
                     status = 1;
