@@ -1525,26 +1525,34 @@ class DB_model {
 class Server_manager {
 
     async Control_time() {
-        var sleep = (a) => { return new Promise(res => setTimeout(res, a)); }
+
+        var sleep = (T) => { return new Promise(res => setTimeout(res, T)); }
 
         while (true) {
 
+            try {
+                var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+                var list = await Connection.db("Chilligames_Servers").listCollections().toArray();
 
-            var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-            var list = await Connection.db("Chilligames_Servers").listCollections().toArray();
+                for (var i = 0; i < list.length; i++) {
 
-            for (var i = 0; i < list.length; i++) {
+                    await Connection.db("Chilligames_Servers").collection(list[i].name).updateMany({}, { $inc: { 'Setting.Active_Days': 1 } });
+                    var Must_delete = await Connection.db("Chilligames_Servers").collection(list[i].name).find({ 'Setting.Active_Days': { $gt: 0 } }).toArray();
+                    for (var a = 0; a < Must_delete.length; a++) {
+                        await Connection.db("Chilligames").collection("Users").updateOne({}, { $pullAll: { ["Servers." + list[i].name]: [String(Must_delete[a]._id)] } });
+                    }
+                    await Connection.db("Chilligames_Servers").collection(list[i].name).findOneAndDelete({ 'Setting.Active_Days': { $gt: 0 } });
 
-                await Connection.db("Chilligames_Servers").collection(list[i].name).updateMany({}, { $inc: { 'Setting.Active_Days': 1 } });
-                var Must_delete = await Connection.db("Chilligames_Servers").collection(list[i].name).find({ 'Setting.Active_Days': { $gt: 0 } }).toArray();
-                for (var a = 0; a < Must_delete.length; a++) {
-                    await Connection.db("Chilligames").collection("Users").updateOne({}, { $pullAll: { ["Servers." + list[i].name]: [String(Must_delete[a]._id)] } });
                 }
-                await Connection.db("Chilligames_Servers").collection(list[i].name).findOneAndDelete({ 'Setting.Active_Days': { $gt: 0 } });
+                Connection.close();
 
+            } catch (e) {
+
+                console.log("server err");
+
+                Connection.close();
             }
 
-            Connection.close();
             await sleep(2000);
         }
 
