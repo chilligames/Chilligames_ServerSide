@@ -785,7 +785,7 @@ class DB_model {
         });
 
         if (result == undefined) {
-            result = 0;
+            result = 3; //change 0->3
         }
 
         Connection.close();
