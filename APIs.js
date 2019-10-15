@@ -1577,7 +1577,7 @@ class Server_manager {
 
                     //for game venomic can delete here
 
-                    for (var b = 0; b < Must_delete.length; i++) {
+                    for (var b = 0; b < Must_delete.length; b++) {
 
                         console.log(Must_delete);
 
