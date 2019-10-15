@@ -432,6 +432,7 @@ class DB_model {
         'Nick_name': '',
         'Score': 0
     }
+
     Raw_model_Friend = {
         'ID': '',
         'Status': ''
@@ -449,7 +450,6 @@ class DB_model {
         'ID': {}
     }
 
-
     Raw_model_messegae_chatroom = {
         'Position': '',
         'ID': '',
@@ -465,6 +465,10 @@ class DB_model {
         'ID': '',
     }
 
+    Raw_model_notifaction = {
+        'Title': '',
+        'Body': ''
+    }
 
 
     async Quick_register() {
@@ -1331,8 +1335,8 @@ class DB_model {
 
         this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
 
-        this.Raw_Model_User.Notifactions.Notifaction[Incoming_name_app] = {};
-        Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { 'Notifactions.Notifaction': this.Raw_Model_User.Notifactions.Notifaction } });
+        this.Raw_Model_User.Notifactions.Notifaction[Incoming_name_app] = [];
+        await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_id) }, { $set: { 'Notifactions.Notifaction': this.Raw_Model_User.Notifactions.Notifaction } });
 
         Connection.close();
     }
@@ -1575,14 +1579,35 @@ class Server_manager {
 
                     var Must_delete = await Connection.db("Chilligames_Servers").collection(list[i].name).find({ 'Setting.Active_Days': { $gt: 0 } }).toArray();
 
-                    //for game venomic can delete here
+                    //for game [venomic] can delete here
+                    for (var score = 0; score < Must_delete.length; score++) {
 
-                    for (var b = 0; b < Must_delete.length; b++) {
+                        let coin = Must_delete[score].Setting.Coine;
+                        let Name_server = Must_delete[score].Setting.Name_server;
 
-                        console.log(Must_delete);
+                        var Player_reward = Must_delete[score].Setting.Leader_board.sort((a, b) => {
+
+                            return a.Score - b.Score;
+
+                        });
+
+                        Player_reward.reverse();
+
+                        for (var reward = 0; reward <= 2; reward++ , (coin /= 2)) {
+
+                            if (Player_reward[reward] != undefined) {
+
+                                await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectID(Player_reward[reward].ID) }, { $inc: { 'Wallet.Coin': Number(coin) } });
+
+                                var DB = new DB_model().Raw_model_notifaction;
+                                DB.Title = "Reward";
+                                DB.Body = ` You have Recive ${coin} Reward for Server:${Name_server} In Game: Venomic`;
+                                await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectID(Player_reward[reward].ID) }, { $push: { 'Notifactions.Notifaction.Venomic': DB } });
+
+                            }
+                        }
 
                     }
-
                     //end delete
 
 
@@ -1598,11 +1623,13 @@ class Server_manager {
 
             } catch (e) {
 
+                console.log(e);
                 console.log("server err");
 
                 Connection.close();
             }
 
+            Connection.close();
             await sleep(2000);
         }
 
