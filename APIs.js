@@ -1577,7 +1577,7 @@ class Server_manager {
 
                     for (var a = 0; a < Must_delete.length; a++) {
 
-                        await Connection.db("Chilligames").collection("Users").updateOne({}, { $pullAll: { ["Servers." + list[i].name]: [String(Must_delete[a]._id)] } });
+                        await Connection.db("Chilligames").collection("Users").update({}, { $pullAll: { ["Servers." + list[i].name]: [String(Must_delete[a]._id)] } });//update one ->update
 
                     }
 
