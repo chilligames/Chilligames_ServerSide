@@ -1628,12 +1628,14 @@ class Server_manager {
                 console.log("server err");
 
                 Connection.close();
+                break;
             }
-
+            
             Connection.close();
             await sleep(2000);
         }
-
+        console.log("restart"); //watch
+        this.Control_time(); //watch
     }
 }
 
