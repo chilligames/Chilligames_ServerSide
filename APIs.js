@@ -1569,13 +1569,24 @@ class Server_manager {
                 var list = await Connection.db("Chilligames_Servers").listCollections().toArray();
 
 
-                for (var i = 0; i < list.length; i++) {
+                for (let i = 0; i < list.length; i++) {
 
                     await Connection.db("Chilligames_Servers").collection(list[i].name).updateMany({}, { $inc: { 'Setting.Active_Days': 1 } });
 
                     var Must_delete = await Connection.db("Chilligames_Servers").collection(list[i].name).find({ 'Setting.Active_Days': { $gt: 0 } }).toArray();
 
-                    for (var a = 0; a < Must_delete.length; a++) {
+                    //for game venomic can delete here
+
+                    for (var b = 0; b < Must_delete.length; i++) {
+
+                        console.log(Must_delete);
+
+                    }
+
+                    //end delete
+
+
+                    for (let a = 0; a < Must_delete.length; a++) {
 
                         await Connection.db("Chilligames").collection("Users").updateMany({}, { $pullAll: { ["Servers." + list[i].name]: [String(Must_delete[a]._id)] } });//update one ->update
                     }
