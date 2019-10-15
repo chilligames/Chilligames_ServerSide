@@ -1595,6 +1595,7 @@ class Server_manager {
 
                         for (var reward = 0; reward <= 2; reward++ , (coin /= 2)) {
 
+                            coin= Math.round(coin);
                             if (Player_reward[reward] != undefined) {
 
                                 await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectID(Player_reward[reward].ID) }, { $inc: { 'Wallet.Coin': Number(coin) } });
@@ -1619,7 +1620,7 @@ class Server_manager {
                     await Connection.db("Chilligames_Servers").collection(list[i].name).findOneAndDelete({ 'Setting.Active_Days': { $gt: 0 } });
 
                 }
-
+                
 
                 Connection.close();
 
