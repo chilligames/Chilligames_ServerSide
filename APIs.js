@@ -1602,7 +1602,7 @@ class Server_manager {
 
                                 var DB = new DB_model().Raw_model_notifaction;
                                 DB.Title = "Reward";
-                                DB.Body = ` You have Recive ${coin} Reward for Server:${Name_server} In Game: Venomic`;
+                                DB.Body = ` You have Recive ${coin} Reward Coin for Server:${Name_server} In Game: Venomic`;
                                 await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectID(Player_reward[reward].ID) }, { $push: { 'Notifactions.Notifaction.Venomic': DB } });
 
                             }
