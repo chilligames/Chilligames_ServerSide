@@ -385,7 +385,6 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
-
     }
 
 }).listen("3333", "0.0.0.0")
@@ -1286,8 +1285,10 @@ class DB_model {
             return result;
 
         } catch (e) {
+            if (Connection.isConnected) {
+                Connection.close();
+            }
             console.log("ERR_Cheack_new_message");
-            Connection.close();
         }
     }
 
@@ -1641,8 +1642,10 @@ class Server_manager {
             } catch (e) {
 
                 console.log("server err");
-
-                Connection.close();
+                if (Connection.isConnected) {
+                    console.log("Connection close");
+                    Connection.close();
+                }
                 break;
             }
 
