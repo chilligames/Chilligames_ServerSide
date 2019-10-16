@@ -1670,6 +1670,11 @@ class Server_manager {
 
             } catch (e) {
 
+                if (Connection.isConnected()) {
+                    console.log("Connection close");
+                    Connection.close();
+                }
+
                 console.log("server err");
                 break;
             }
