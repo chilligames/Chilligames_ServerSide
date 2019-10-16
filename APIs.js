@@ -1292,9 +1292,7 @@ class DB_model {
             return result;
 
         } catch (e) {
-            if (Connection.isConnected) {
-                Connection.close();
-            }
+            Connection.close();
             console.log("ERR_Cheack_new_message");
         }
     }
@@ -1386,9 +1384,7 @@ class DB_model {
 
 
         } catch (e) {
-            if (Connection.isConnected()) {
-                Connection.close();
-            }
+            Connection.close();
 
             console.log("ERR->insert coin");
         }
@@ -1597,9 +1593,7 @@ class DB_model {
 
         } catch (e) {
 
-            if (Connection.isConnected) {
-                Connection.close();
-            }
+            print("ERR-> add purchasses");
         }
 
     }
@@ -1674,10 +1668,6 @@ class Server_manager {
             } catch (e) {
 
                 console.log("server err");
-                if (Connection.isConnected) {
-                    console.log("Connection close");
-                    Connection.close();
-                }
                 break;
             }
 
