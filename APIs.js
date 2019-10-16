@@ -1589,8 +1589,6 @@ class DB_model {
 
 
     async Add_purchases_history(Incomin_id, incomin_data) {
-
-        console.log("inject");
         try {
             var Connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
             await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incomin_id) }, { $push: { 'Wallet.Purchases': JSON.parse(incomin_data) } });
