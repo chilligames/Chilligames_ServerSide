@@ -1377,11 +1377,22 @@ class DB_model {
 
 
     async insert_coin(Incoming_ID, Coin) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(Incoming_ID) });
-        this.Raw_Model_User.Wallet.Coin = (this.Raw_Model_User.Wallet.Coin + Number(Coin));
-        await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_ID) }, { $set: { 'Wallet.Coin': this.Raw_Model_User.Wallet.Coin } });
-        Connection.close();
+
+        try {
+
+            var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+            console.log(Coin);
+            await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_ID) }, { $inc: { 'Wallet.Coin': Number(Coin) } });
+            Connection.close();
+
+
+        } catch (e) {
+            if (Connection.isConnected()) {
+                Connection.close();
+            }
+
+            console.log("ERR->insert coin");
+        }
     }
 
 
