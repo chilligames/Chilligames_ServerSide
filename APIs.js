@@ -387,10 +387,16 @@ app_api.get("/APIs", (req, res) => {
         } break;
 
     }
+
 }).listen("3333", "0.0.0.0")
 
 
 //database
+/*future 
+ * 1: all connect to server ->one connection
+ * 2: try catch add to each methode
+ */
+
 var mongo_raw = require('mongodb');
 var Mongo_string = "mongodb://localhost:27017/admin";
 
@@ -1262,6 +1268,7 @@ class DB_model {
 
     async Cheack_new_message(Incomig_id) {
         try {
+
             var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
             this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomig_id) });
             var result;
@@ -1279,14 +1286,14 @@ class DB_model {
             return result;
 
         } catch (e) {
-            console.log("ERR");
+            console.log("ERR_Cheack_new_message");
             Connection.close();
-
         }
     }
 
 
     async Mark_all_messages_as_read(Incoming_id) {
+
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
         var User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incoming_id) });
 
