@@ -1261,21 +1261,28 @@ class DB_model {
 
 
     async Cheack_new_message(Incomig_id) {
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-        var User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomig_id) });
-        var result;
+        try {
+            var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+            this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectId(Incomig_id) });
+            var result;
 
-        for (var i = 0; i < User.Notifactions.Message.length; i++) {
+            for (var i = 0; i < this.Raw_Model_User.Notifactions.Message.length; i++) {
 
-            if (User.Notifactions.Message[i].Status != 0) {
-                result = "1";
-                break;
-            } else {
-                result = "0";
+                if (this.Raw_Model_User.Notifactions.Message[i].Status != 0) {
+                    result = "1";
+                    break;
+                } else {
+                    result = "0";
+                }
             }
+            Connection.close();
+            return result;
+
+        } catch (e) {
+            console.log("ERR");
+            Connection.close();
+
         }
-        Connection.close();
-        return result;
     }
 
 
@@ -1595,7 +1602,7 @@ class Server_manager {
 
                         for (var reward = 0; reward <= 2; reward++ , (coin /= 2)) {
 
-                            coin= Math.round(coin);
+                            coin = Math.round(coin);
                             if (Player_reward[reward] != undefined) {
 
                                 await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectID(Player_reward[reward].ID) }, { $inc: { 'Wallet.Coin': Number(coin) } });
@@ -1620,7 +1627,7 @@ class Server_manager {
                     await Connection.db("Chilligames_Servers").collection(list[i].name).findOneAndDelete({ 'Setting.Active_Days': { $gt: 0 } });
 
                 }
-                
+
 
                 Connection.close();
 
@@ -1631,7 +1638,7 @@ class Server_manager {
                 Connection.close();
                 break;
             }
-            
+
             Connection.close();
             await sleep(2000);
         }
