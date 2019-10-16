@@ -1381,7 +1381,6 @@ class DB_model {
         try {
 
             var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-            console.log(Coin);
             await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incoming_ID) }, { $inc: { 'Wallet.Coin': Number(Coin) } });
             Connection.close();
 
