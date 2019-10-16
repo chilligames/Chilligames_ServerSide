@@ -385,6 +385,12 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "APH": {
+            DB.Add_purchases_history(_id, Data_inject).then(() => {
+
+                res.end();
+            });
+        } break;
     }
 
 }).listen("3333", "0.0.0.0")
@@ -426,7 +432,8 @@ class DB_model {
         "Wallet": {
             "Coin": 0,
             "Money": 0.0,
-            "Offers": {}
+            "Offers": {},
+            "Purchases": []
         },
         "Servers": {},
         "Leader_board": {}
@@ -1571,13 +1578,30 @@ class DB_model {
     }
 
 
+    async Add_purchases_history(Incomin_id, incomin_data) {
+
+        console.log("inject");
+        try {
+            var Connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
+            await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incomin_id) }, { $push: { 'Wallet.Purchases': JSON.parse(incomin_data) } });
+
+            Connection.close();
+
+        } catch (e) {
+
+            if (Connection.isConnected) {
+                Connection.close();
+            }
+        }
+
+    }
+
 }
 
 
 class Server_manager {
 
     async Control_time() {
-
         var sleep = (T) => { return new Promise(res => setTimeout(res, T)); }
 
         while (true) {
@@ -1649,10 +1673,10 @@ class Server_manager {
                 break;
             }
 
-            Connection.close();
             await sleep(2000);
         }
         console.log("restart"); //watch
+
         this.Control_time(); //watch
     }
 }
