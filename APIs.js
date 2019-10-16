@@ -1596,7 +1596,7 @@ class DB_model {
             if (Connection.isConnected) {
                 console.log("close");
             }
-            print("ERR-> add purchasses");
+            console.log("ERR-> add purchasses");
         }
 
     }
