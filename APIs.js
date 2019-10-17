@@ -1093,27 +1093,38 @@ class DB_model {
 
     async Send_message_to_chatroom(Incoming_ID, Incoming_name_app, Incoming_message) {
 
-        var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-        this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(Incoming_ID) });
+        try {
 
-        var position = await Connection.db("Chilligames_Chat").collection(Incoming_name_app).find({}, { sort: { 'Position': -1 } }).toArray();
-        if (position == undefined) {
-            this.Raw_model_messegae_chatroom.Position = 0
-        } else {
+            var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+            this.Raw_Model_User = await Connection.db("Chilligames").collection("Users").findOne({ '_id': new mongo_raw.ObjectID(Incoming_ID) });
+            var postion = 0;
 
-            this.Raw_model_messegae_chatroom.Position = position[0].Position + 1;
+            try {
+
+                var position = await Connection.db("Chilligames_Chat").collection(Incoming_name_app).find({}, { sort: { 'Position': -1 } }).toArray();
+                this.Raw_model_messegae_chatroom.Position = position[0].Position + 1;
+
+            } catch (e) {
+                this.Raw_model_messegae_chatroom.Position = 0;
+            }
+
+
+
+            this.Raw_model_messegae_chatroom.ID = Incoming_ID;
+            this.Raw_model_messegae_chatroom.Nick_Name = this.Raw_Model_User.Info.Nickname;
+            this.Raw_model_messegae_chatroom.Message = Incoming_message;
+            this.Raw_model_messegae_chatroom.Report = 0;
+            this.Raw_model_messegae_chatroom.Time = new Date().toUTCString();
+
+            await Connection.db("Chilligames_Chat").collection(Incoming_name_app).insertOne(this.Raw_model_messegae_chatroom);
+
+            Connection.close();
+
+        } catch (e) {
+            if (Connection.isConnected()) {
+                Connection.close();
+            }
         }
-
-
-        this.Raw_model_messegae_chatroom.ID = Incoming_ID;
-        this.Raw_model_messegae_chatroom.Nick_Name = this.Raw_Model_User.Info.Nickname;
-        this.Raw_model_messegae_chatroom.Message = Incoming_message;
-        this.Raw_model_messegae_chatroom.Report = 0;
-        this.Raw_model_messegae_chatroom.Time = new Date().toUTCString();
-
-        await Connection.db("Chilligames_Chat").collection(Incoming_name_app).insertOne(this.Raw_model_messegae_chatroom);
-
-        Connection.close();
     }
 
 
