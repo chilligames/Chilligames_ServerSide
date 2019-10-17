@@ -1664,17 +1664,10 @@ class Server_manager {
                     await Connection.db("Chilligames_Servers").collection(list[i].name).findOneAndDelete({ 'Setting.Active_Days': { $gt: 0 } });
 
                 }
-
-
                 Connection.close();
 
             } catch (e) {
-
-                if (Connection.isConnected()) {
-                    console.log("Connection close");
-                    Connection.close();
-                }
-
+                console.log(e);
                 console.log("server err");
                 break;
             }
