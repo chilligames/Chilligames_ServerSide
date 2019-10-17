@@ -403,7 +403,7 @@ app_api.get("/APIs", (req, res) => {
  */
 
 var mongo_raw = require('mongodb');
-var Mongo_string = "mongodb://localhost:33233/admin";
+var Mongo_string = "mongodb://localhost:33323/admin";
 
 class DB_model {
 
@@ -1661,13 +1661,16 @@ class Server_manager {
                         await Connection.db("Chilligames").collection("Users").updateMany({}, { $pullAll: { ["Servers." + list[i].name]: [String(Must_delete[a]._id)] } });//update one ->update
                     }
 
+
                     await Connection.db("Chilligames_Servers").collection(list[i].name).findOneAndDelete({ 'Setting.Active_Days': { $gt: 0 } });
 
                 }
                 Connection.close();
 
             } catch (e) {
-                console.log(e);
+                if (Connection.isConnected()) {
+                    Connection.close();
+                }
                 console.log("server err");
                 break;
             }
