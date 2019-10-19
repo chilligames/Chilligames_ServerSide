@@ -1300,7 +1300,7 @@ class DB_model {
                 }
             }
 
-            console.log(this.Raw_Model_User.Notifactions.Notifaction);
+            console.log(this.Raw_Model_User.Notifactions.Notifaction.length);
             
             Connection.close();
             return result;
