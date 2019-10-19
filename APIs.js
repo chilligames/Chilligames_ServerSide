@@ -1605,7 +1605,7 @@ class DB_model {
             this.Raw_model_notifaction.Title = "Purchase successful";
             this.Raw_model_notifaction.Body = "Your purchase was successful depositing coins into your account";
 
-            await Connection.db("Chilligames").collection("Userss").findOneAndUpdate({ '_id': new mongo_raw.ObjectID(incomin_data) }, { $push: { ['Notifactions.Notifaction.' + incoming_name_app]: this.Raw_model_notifaction } });
+            await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectID(incomin_data) }, { $push: { ['Notifactions.Notifaction.' + incoming_name_app]: this.Raw_model_notifaction } });
 
             Connection.close();
 
