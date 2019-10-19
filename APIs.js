@@ -386,7 +386,7 @@ app_api.get("/APIs", (req, res) => {
             });
         } break;
         case "APH": {
-            DB.Add_purchases_history(_id, Data_inject).then(() => {
+            DB.Add_purchases_history(_id, Data_inject, Name_App).then(() => {
 
                 res.end();
             });
@@ -1595,10 +1595,17 @@ class DB_model {
     }
 
 
-    async Add_purchases_history(Incomin_id, incomin_data) {
+    async Add_purchases_history(Incomin_id, incomin_data, incoming_name_app) {
         try {
+
             var Connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
             await Connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(Incomin_id) }, { $push: { 'Wallet.Purchases': JSON.parse(incomin_data) } });
+
+
+            this.Raw_model_notifaction.Title = "Purchase successful";
+            this.Raw_model_notifaction.Body = "Your purchase was successful depositing coins into your account";
+
+            await Connection.db("Chilligames").collection("Userss").findOneAndUpdate({ '_id': new mongo_raw.ObjectID(incomin_data) }, { $push: { ['Notifactions.Notifaction.' + incoming_name_app]: this.Raw_model_notifaction } });
 
             Connection.close();
 
