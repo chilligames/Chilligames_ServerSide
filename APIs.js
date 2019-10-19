@@ -211,7 +211,7 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "CNM": {
 
-            DB.Cheack_new_message(_id).then((result) => {
+            DB.Cheack_new_message(_id,Name_App).then((result) => {
                 res.send(result);
                 res.end();
             });
@@ -1283,7 +1283,7 @@ class DB_model {
     }
 
 
-    async Cheack_new_message(Incomig_id) {
+    async Cheack_new_message(Incomig_id,incoming_name_app) {
         try {
 
             var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
@@ -1300,7 +1300,8 @@ class DB_model {
                 }
             }
 
-            console.log(this.Raw_Model_User.Notifactions.Notifaction.length);
+          
+            console.log(this.Raw_Model_User.Notifactions.Notifaction[incoming_name_app].length);
             
             Connection.close();
             return result;
