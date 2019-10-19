@@ -1299,6 +1299,9 @@ class DB_model {
                     result = "0";
                 }
             }
+
+            console.log(this.Raw_Model_User.Notifactions.Notifaction);
+            
             Connection.close();
             return result;
 
