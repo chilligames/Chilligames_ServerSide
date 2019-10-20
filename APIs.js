@@ -34,7 +34,7 @@ app_api.get("/APIs", (req, res) => {
     var Key = req.header("Key");
     var Rate = req.header("Rate");
     var IP = req.ip;
-   
+
     switch (pipe_line) {
         case "QR": {
 
@@ -410,7 +410,7 @@ app_api.get("/APIs", (req, res) => {
         } break;
         case "SLU": {
 
-            DB_admin.Send_log_user(_id, Data_user,IP).then(() => {
+            DB_admin.Send_log_user(_id, Data_user, IP).then(() => {
                 res.end();
             });
         } break;
@@ -1346,20 +1346,22 @@ class DB_model {
                 }
             }
 
+            if (result == "0") {
 
-            try {
+                try {
 
-                if (this.Raw_Model_User.Notifactions.Notifaction[incoming_name_app].length <= 0) {
+                    if (this.Raw_Model_User.Notifactions.Notifaction[incoming_name_app].length <= 0) {
+
+                        result = "0";
+
+                    } else {
+                        result = "1";
+                    }
+
+                } catch (e) {
 
                     result = "0";
-
-                } else {
-                    result = "1";
                 }
-
-            } catch (e) {
-
-                result = "0";
             }
 
 
@@ -1368,7 +1370,7 @@ class DB_model {
 
         } catch (e) {
             Connection.close();
-            console.log("ERR_Cheack_new_message");
+            console.log("ERR_Cheack_new_message"+Incomig_id);
         }
     }
 
@@ -1739,7 +1741,7 @@ class Admins {
         }
     }
 
-    async Send_log_user(incoming_id, incoming_data,IP) {
+    async Send_log_user(incoming_id, incoming_data, IP) {
         try {
 
             var connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
