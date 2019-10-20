@@ -413,7 +413,7 @@ app_api.get("/APIs", (req, res) => {
         case "SLU": {
 
             DB_admin.Send_log_user(_id, Data_user).then(() => {
-                console.lo(Connection_info);
+                console.log(Connection_info);
                 res.end();
             });
         } break;
