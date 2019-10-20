@@ -396,7 +396,8 @@ app_api.get("/APIs", (req, res) => {
     }
     switch (Pipe_line_admin) {
         case "RV": {
-            DB_admin.Recive_version(Name_App).then(() => {
+            DB_admin.Recive_version(Name_App).then((result) => {
+                res.send(result);
                 res.end();
             });
         } break;
@@ -1675,8 +1676,6 @@ class Admins {
 
             console.log("ERR=>Recive_version");
         }
-
-
     }
 }
 class Server_manager {
