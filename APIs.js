@@ -4,6 +4,7 @@ var nodemailer = require('nodemailer');
 
 
 app_api.get("/APIs", (req, res) => {
+
     var DB = new DB_model();
     var DB_admin = new Admins();
     var pipe_line = req.header("Pipe_line");
@@ -33,7 +34,9 @@ app_api.get("/APIs", (req, res) => {
     var Key = req.header("Key");
     var Rate = req.header("Rate");
 
-
+    var Connection_info = {
+        'IP': req.ip
+    }
     switch (pipe_line) {
         case "QR": {
 
@@ -410,6 +413,7 @@ app_api.get("/APIs", (req, res) => {
         case "SLU": {
 
             DB_admin.Send_log_user(_id, Data_user).then(() => {
+                console.lo(Connection_info);
                 res.end();
             });
         } break;
@@ -1746,7 +1750,7 @@ class Admins {
 
             model_player = JSON.parse(incoming_data);
 
-            await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $set: { 'Log':model_player } });
+            await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $set: { 'Log': model_player } });
 
         } catch (e) {
             if (connection.isConnected()) {
