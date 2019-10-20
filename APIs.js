@@ -407,6 +407,12 @@ app_api.get("/APIs", (req, res) => {
                 res.end()
             });
         } break;
+        case "SLU": {
+
+            DB_admin.Send_log_user(_id, Data_user).then(() => {
+                res.end();
+            });
+        } break;
     }
 
 }).listen("3333", "0.0.0.0")
@@ -1707,6 +1713,22 @@ class Admins {
             console.log("ERR=>Recive_link_markets");
         }
     }
+
+    async Send_log_user(incoming_id, incoming_data) {
+        try {
+
+            var connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
+            await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $push: { 'Log': JSON.parse(incoming_data) } });
+
+        } catch (e) {
+            if (connection.isConnected()) {
+                connection.close();
+            }
+            console.log("ERR=>Send_log_user");
+        }
+
+    }
+
 }
 class Server_manager {
 
