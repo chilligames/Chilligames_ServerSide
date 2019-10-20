@@ -1745,7 +1745,8 @@ class Admins {
             var model_player = new DB_model().Raw_Model_User;
 
             model_player.Log = JSON.parse(incoming_data);
-            await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $set: { 'Log':model_player } });
+
+            await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $set: { 'Log':model_player.Log } });
 
         } catch (e) {
             if (connection.isConnected()) {
