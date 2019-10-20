@@ -5,7 +5,9 @@ var nodemailer = require('nodemailer');
 
 app_api.get("/APIs", (req, res) => {
     var DB = new DB_model();
+    var DB_admin = new Admins();
     var pipe_line = req.header("Pipe_line");
+    var Pipe_line_admin = req.header("Pipe_admin");
     var Pipe_line_data = req.header("Pipe_line_data");
     var _id = req.header("_id");
     var _id_server = req.header("_id_Server");
@@ -388,6 +390,13 @@ app_api.get("/APIs", (req, res) => {
         case "APH": {
             DB.Add_purchases_history(_id, Data_inject, Name_App).then(() => {
 
+                res.end();
+            });
+        } break;
+    }
+    switch (Pipe_line_admin) {
+        case "RV": {
+            DB_admin.Recive_version(Name_App).then(() => {
                 res.end();
             });
         } break;
@@ -1641,7 +1650,28 @@ class DB_model {
 
 }
 
+class Admins {
+    model_admin = {
 
+        'New_version': 0.0,
+        'Maintance': 0
+    }
+
+    async Recive_version(incoming_name_app) {
+
+        try {
+            var connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
+            this.model_admin = await connection.db("Chilligames_Setting").collection(incoming_name_app).findOne({});
+
+            return this.model_admin.New_version;
+
+        } catch (e) {
+
+        }
+
+
+    }
+}
 class Server_manager {
 
     async Control_time() {
