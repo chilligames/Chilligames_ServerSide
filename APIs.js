@@ -397,7 +397,7 @@ app_api.get("/APIs", (req, res) => {
     switch (Pipe_line_admin) {
         case "RV": {
             DB_admin.Recive_version(Name_App).then((result) => {
-                res.send(result);
+                res.send(String(result));
                 res.end();
             });
         } break;
