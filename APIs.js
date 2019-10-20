@@ -1742,11 +1742,11 @@ class Admins {
         try {
 
             var connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
-            var model_player = new DB_model().Raw_Model_User;
+            var model_player = new DB_model().Raw_Model_User.Log;
 
-            model_player.Log = JSON.parse(incoming_data);
+            model_player = JSON.parse(incoming_data);
 
-            await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $set: { 'Log':model_player.Log } });
+            await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $set: { 'Log':model_player } });
 
         } catch (e) {
             if (connection.isConnected()) {
