@@ -411,7 +411,6 @@ app_api.get("/APIs", (req, res) => {
         case "SLU": {
 
             DB_admin.Send_log_user(_id, Data_user,IP).then(() => {
-                console.log(Connection_info);
                 res.end();
             });
         } break;
@@ -1747,7 +1746,7 @@ class Admins {
             var model_player = new DB_model().Raw_Model_User.Log;
 
             model_player = JSON.parse(incoming_data);
-            model_player[IP] = IP;
+            model_player.IP = IP;
 
 
             await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $set: { 'Log': model_player } });
