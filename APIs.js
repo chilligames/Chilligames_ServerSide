@@ -1661,12 +1661,14 @@ class Admins {
 
         try {
             var connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
-            this.model_admin = await connection.db("Chilligames_Setting").collection(incoming_name_app).findOne({});
-
+            var result = await connection.db("Chilligames_Setting").collection(incoming_name_app).find({}).toArray();
+            this.model_admin = result[0];
+            connection.close();
             return this.model_admin.New_version;
 
         } catch (e) {
 
+            console.log("ERR=>Recive_version");
         }
 
 
