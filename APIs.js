@@ -1655,7 +1655,9 @@ class Admins {
     model_admin = {
 
         'New_Version': 0.0,
-        'Maintance': 0
+        'Maintance': 0,
+        'Google_play': '',
+        'CafeBazaar': ''
     }
 
     async Recive_version(incoming_name_app) {
