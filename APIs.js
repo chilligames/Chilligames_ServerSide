@@ -442,7 +442,30 @@ class DB_model {
         "Ban": [],
         "Friends": [],
         "Avatar": '',
-        "Log": [],
+        "Log": {
+            'Time': '',
+            'Platform': '',
+            'Model_divice': '',
+            'Divice_name': '',
+            'DiviceType': '',
+            'Graphic': '',
+            'Operation': '',
+            'Proccese': '',
+            'Procces_count': '',
+            'procces_Frequency': '',
+            'supportsAccelerometer': '',
+            'supportsGyroscope': '',
+            'MemorySize': '',
+            'UnityVersion': '',
+            'CompanyName': '',
+            'DataPath': '',
+            'Installer': '',
+            'PurductName': '',
+            'Language': '',
+            'GameVersion': '',
+            'Uniq_id': ''
+
+        },
         "Files": [],
         "Data": {},
         "Inventory": [],
@@ -1672,6 +1695,7 @@ class Admins {
         'CafeBazaar': ''
     }
 
+
     async Recive_version(incoming_name_app) {
 
         try {
@@ -1718,7 +1742,10 @@ class Admins {
         try {
 
             var connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
-            await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $push: { 'Log': JSON.parse(incoming_data) } });
+            var model_player = new DB_model().Raw_Model_User;
+
+            model_player.Log = JSON.parse(incoming_data);
+            await connection.db("Chilligames").collection("Users").updateOne({ '_id': new mongo_raw.ObjectId(incoming_id) }, { $set: { 'Log':model_player } });
 
         } catch (e) {
             if (connection.isConnected()) {
