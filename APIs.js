@@ -412,7 +412,7 @@ app_api.get("/APIs", (req, res) => {
  */
 
 var mongo_raw = require('mongodb');
-var Mongo_string = "mongodb://localhost:33323/admin";
+var Mongo_string = "mongodb://localhost:27017/admin"; //change to 33323
 
 class DB_model {
 
@@ -1653,7 +1653,7 @@ class DB_model {
 class Admins {
     model_admin = {
 
-        'New_version': 0.0,
+        'New_Version': 0.0,
         'Maintance': 0
     }
 
@@ -1661,12 +1661,17 @@ class Admins {
 
         try {
             var connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
-            var result = await connection.db("Chilligames_Setting").collection(incoming_name_app).find({}).toArray();
-            this.model_admin = result[0];
+            this.model_admin = await connection.db("Chilligames_Setting").collection(incoming_name_app).findOne({});
+
             connection.close();
-            return this.model_admin.New_version;
+
+            return this.model_admin.New_Version;
 
         } catch (e) {
+
+            if (connection.isConnected()) {
+                connection.close();
+            }
 
             console.log("ERR=>Recive_version");
         }
