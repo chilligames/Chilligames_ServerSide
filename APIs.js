@@ -401,6 +401,12 @@ app_api.get("/APIs", (req, res) => {
                 res.end();
             });
         } break;
+        case "RLM": {
+            DB_admin.recive_link_market(Name_App).then(result => {
+                res.send(result);
+                res.end()
+            });
+        } break;
     }
 
 }).listen("3333", "0.0.0.0")
@@ -413,7 +419,7 @@ app_api.get("/APIs", (req, res) => {
  */
 
 var mongo_raw = require('mongodb');
-var Mongo_string = "mongodb://localhost:33323/admin"; //change to 33323
+var Mongo_string = "mongodb://localhost:27017/admin"; //change to 33323
 
 class DB_model {
 
@@ -1677,6 +1683,28 @@ class Admins {
             }
 
             console.log("ERR=>Recive_version");
+        }
+    }
+
+    async recive_link_market(Incoming_name_app) {
+
+        try {
+            var Connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
+            var result = await Connection.db("Chilligames_Setting").collection(Incoming_name_app).findOne({}, { projection: { 'Google_Play': 1, 'CafeBazaar': 1 } });
+            Connection.close();
+
+            var market = {
+                'Google_Play': result.Google_Play,
+                'CafeBazaar': result.CafeBazaar
+            }
+
+            return market;
+
+        } catch (e) {
+            if (Connection.isConnected()) {
+                Connection.close();
+            }
+            console.log("ERR=>Recive_link_markets");
         }
     }
 }
