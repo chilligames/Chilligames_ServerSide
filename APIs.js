@@ -1747,7 +1747,6 @@ class Admins {
 
             var connection = await new mongo_raw.MongoClient(Mongo_string, { useUnifiedTopology: true, useNewUrlParser: true }).connect();
             var model_player = {};
-            model_player = new DB_model().Raw_Model_User.Log;
 
             model_player = JSON.parse(incoming_data);
             model_player.IP = IP;
