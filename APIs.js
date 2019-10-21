@@ -1369,6 +1369,7 @@ class DB_model {
             return result;
 
         } catch (e) {
+
             Connection.close();
             console.log("ERR_Cheack_new_message"+Incomig_id);
         }
