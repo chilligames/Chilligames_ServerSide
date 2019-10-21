@@ -29,9 +29,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="Admins.js">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="APIs.js">
       <SubType>Code</SubType>
     </Content>
