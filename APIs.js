@@ -474,7 +474,7 @@ class DB_model {
         'Body': ''
     }
 
-
+     
 
     async Quick_login(Incoming_id) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
