@@ -3,9 +3,7 @@ var app_api = Express();
 var nodemailer = require('nodemailer');
 var Aut = require('./Core/Aut');
 
-Aut.Quick_Register().then(ss => {
-    console.log(ss);
-});
+
 
 app_api.get("/APIs", (req, res) => {
 
@@ -41,12 +39,10 @@ app_api.get("/APIs", (req, res) => {
 
     switch (pipe_line) {
         case "QR": {
-
-            DB.Quick_register().then((result) => {
+            Aut.Quick_Register().then(result => {
                 res.send(result);
                 res.end();
             });
-
 
         } break;
         case "QL": {
@@ -434,60 +430,6 @@ var Mongo_string = "mongodb://localhost:33323/admin"; //change to 33323
 
 class DB_model {
 
-    Raw_Model_User = {
-        "Info": {
-            "Username": '',
-            'Password': '',
-            'Email': '',
-            'Nickname': '',
-            'Status': '',
-            'Reset_code': "",
-            'Rates': {}
-        },
-        "Ban": [],
-        "Friends": [],
-        "Avatar": '',
-        "Log": {
-            'Time': '',
-            'Platform': '',
-            'Model_divice': '',
-            'Divice_name': '',
-            'DiviceType': '',
-            'Graphic': '',
-            'Operation': '',
-            'Proccese': '',
-            'Procces_count': '',
-            'procces_Frequency': '',
-            'supportsAccelerometer': '',
-            'supportsGyroscope': '',
-            'MemorySize': '',
-            'UnityVersion': '',
-            'CompanyName': '',
-            'DataPath': '',
-            'Installer': '',
-            'PurductName': '',
-            'Language': '',
-            'GameVersion': '',
-            'Uniq_id': ''
-
-        },
-        "Files": [],
-        "Data": {},
-        "Inventory": [],
-        "Notifactions": {
-            'Message': [],
-            'Notifaction': {}
-        },
-        "Teams": [],
-        "Wallet": {
-            "Coin": 0,
-            "Money": 0.0,
-            "Offers": {},
-            "Purchases": []
-        },
-        "Servers": {},
-        "Leader_board": {}
-    }
 
     Raw_model_leader_board = {
         'ID': '',
@@ -532,23 +474,6 @@ class DB_model {
         'Body': ''
     }
 
-
-    async Quick_register() {
-
-        var connected = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-
-        var Result_insert = await connected.db("Chilligames").collection("Users").insertOne(this.Raw_Model_User);
-
-        var _id = new mongo_raw.ObjectId(Result_insert.insertedId);
-
-        this.Raw_Model_User.Info.Nickname = _id.toHexString();
-
-        await connected.db("Chilligames").collection("Users").updateOne({ '_id': _id }, { $set: { "Info.Nickname": this.Raw_Model_User.Info.Nickname } });
-
-        connected.close();
-
-        return Result_insert.insertedId.toHexString();
-    }
 
 
     async Quick_login(Incoming_id) {

@@ -4,35 +4,21 @@ var mongostring = "mongodb://localhost:27017/admin";
 var Client = new db.MongoClient(mongostring, { useUnifiedTopology: true, useNewUrlParser: true });
 
 
-module.exports.Connect = async () => {
-
-    await Client.connect();
-
-}
-
-module.exports.Disconnect = async () => {
-
-    await Client.close();
-}
-
-module.exports.Status_server = async () => {
-    if (await Client.isConnected()) {
-        return true
-    } else {
-        
-        return false
-    }
-}
-
 module.exports.Insert_doc = async (DB, Collection, Doc) => {
-    var result = '';
+    var result = "";
 
-    if (this.Status_server) {
+    while (result.length < 1) {
 
-        Client.db("Chilligames");
-    } else {
-
-
+        if (await Client.isConnected()) {
+            var id = await Client.db(DB).collection(Collection).insertOne(Doc);
+            result = await id.insertedId.toHexString();
+        } else {
+            await Client.connect();
+        }
+        if (result.length > 1) {
+            break;
+        }
     }
-
+    return result;
 }
+

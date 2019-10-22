@@ -38,6 +38,9 @@
     <Content Include="Core\DB\DB.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="Core\Models.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="DB.js">
       <SubType>Code</SubType>
     </Content>
