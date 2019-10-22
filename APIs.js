@@ -45,6 +45,12 @@ app_api.get("/APIs", (req, res) => {
             });
 
         } break;
+        case "RUEP": {
+            Aut.Register_Username_email_password(Username,Email,Password).then((result) => {
+                res.send(result);
+                res.end();
+            });
+        }
         case "QL": {
 
             DB.Quick_login(_id).then(result => {
@@ -468,13 +474,13 @@ class DB_model {
         'Time': '',
         'ID': '',
     }
-     
+
     Raw_model_notifaction = {
         'Title': '',
         'Body': ''
     }
 
-     
+
 
     async Quick_login(Incoming_id) {
         var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();

@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Core",
+    "\\Core\\DB"
   ],
-  "SelectedNode": "\\README.md",
+  "SelectedNode": "\\APIs.js",
   "PreviewInSolutionExplorer": false
 }
