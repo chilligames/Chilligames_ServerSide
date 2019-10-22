@@ -1,7 +1,11 @@
 ﻿var Express = require('express');
 var app_api = Express();
 var nodemailer = require('nodemailer');
+var Aut = require('./Core/Aut');
 
+Aut.Quick_Register().then(ss => {
+    console.log(ss);
+});
 
 app_api.get("/APIs", (req, res) => {
 
@@ -1371,7 +1375,7 @@ class DB_model {
         } catch (e) {
 
             Connection.close();
-            console.log("ERR_Cheack_new_message"+Incomig_id);
+            console.log("ERR_Cheack_new_message" + Incomig_id);
         }
     }
 
@@ -1760,90 +1764,91 @@ class Admins {
             }
             console.log("ERR=>Send_log_user");
         }
-         //test
+        //test
     }
 
 }
-class Server_manager {
 
-    async Control_time() {
-        var sleep = (T) => { return new Promise(res => setTimeout(res, T)); }
+//class Server_manager {
 
-        while (true) {
+//    async Control_time() {
+//        var sleep = (T) => { return new Promise(res => setTimeout(res, T)); }
 
-            try {
-                var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+//        while (true) {
 
-                var list = await Connection.db("Chilligames_Servers").listCollections().toArray();
+//            try {
+//                var Connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
 
-
-                for (let i = 0; i < list.length; i++) {
-
-                    await Connection.db("Chilligames_Servers").collection(list[i].name).updateMany({}, { $inc: { 'Setting.Active_Days': 1 } });
-
-                    var Must_delete = await Connection.db("Chilligames_Servers").collection(list[i].name).find({ 'Setting.Active_Days': { $gt: 0 } }).toArray();
-
-                    //for game [venomic] can delete here
-                    for (var score = 0; score < Must_delete.length; score++) {
-
-                        let coin = Must_delete[score].Setting.Coine;
-                        let Name_server = Must_delete[score].Setting.Name_server;
-
-                        var Player_reward = Must_delete[score].Setting.Leader_board.sort((a, b) => {
-
-                            return a.Score - b.Score;
-
-                        });
-
-                        Player_reward.reverse();
-
-                        for (var reward = 0; reward <= 2; reward++ , (coin /= 2)) {
-
-                            coin = Math.round(coin);
-                            if (Player_reward[reward] != undefined) {
-
-                                await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectID(Player_reward[reward].ID) }, { $inc: { 'Wallet.Coin': Number(coin) } });
-
-                                var DB = new DB_model().Raw_model_notifaction;
-                                DB.Title = "Reward";
-                                DB.Body = ` You have Recive ${coin} Reward Coin for Server:${Name_server} In Game: Venomic`;
-                                await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectID(Player_reward[reward].ID) }, { $push: { 'Notifactions.Notifaction.Venomic': DB } });
-
-                            }
-                        }
-
-                    }
-                    //end delete
+//                var list = await Connection.db("Chilligames_Servers").listCollections().toArray();
 
 
-                    for (let a = 0; a < Must_delete.length; a++) {
+//                for (let i = 0; i < list.length; i++) {
 
-                        await Connection.db("Chilligames").collection("Users").updateMany({}, { $pullAll: { ["Servers." + list[i].name]: [String(Must_delete[a]._id)] } });//update one ->update
-                    }
+//                    await Connection.db("Chilligames_Servers").collection(list[i].name).updateMany({}, { $inc: { 'Setting.Active_Days': 1 } });
+
+//                    var Must_delete = await Connection.db("Chilligames_Servers").collection(list[i].name).find({ 'Setting.Active_Days': { $gt: 0 } }).toArray();
+
+//                    //for game [venomic] can delete here
+//                    for (var score = 0; score < Must_delete.length; score++) {
+
+//                        let coin = Must_delete[score].Setting.Coine;
+//                        let Name_server = Must_delete[score].Setting.Name_server;
+
+//                        var Player_reward = Must_delete[score].Setting.Leader_board.sort((a, b) => {
+
+//                            return a.Score - b.Score;
+
+//                        });
+
+//                        Player_reward.reverse();
+
+//                        for (var reward = 0; reward <= 2; reward++ , (coin /= 2)) {
+
+//                            coin = Math.round(coin);
+//                            if (Player_reward[reward] != undefined) {
+
+//                                await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectID(Player_reward[reward].ID) }, { $inc: { 'Wallet.Coin': Number(coin) } });
+
+//                                var DB = new DB_model().Raw_model_notifaction;
+//                                DB.Title = "Reward";
+//                                DB.Body = ` You have Recive ${coin} Reward Coin for Server:${Name_server} In Game: Venomic`;
+//                                await Connection.db("Chilligames").collection("Users").findOneAndUpdate({ '_id': new mongo_raw.ObjectID(Player_reward[reward].ID) }, { $push: { 'Notifactions.Notifaction.Venomic': DB } });
+
+//                            }
+//                        }
+
+//                    }
+//                    //end delete
 
 
-                    await Connection.db("Chilligames_Servers").collection(list[i].name).findOneAndDelete({ 'Setting.Active_Days': { $gt: 0 } });
+//                    for (let a = 0; a < Must_delete.length; a++) {
 
-                }
-                Connection.close();
-
-            } catch (e) {
-                if (Connection.isConnected()) {
-                    Connection.close();
-                }
-                console.log("server err");
-                break;
-            }
-
-            await sleep(2000);
-        }
-        console.log("restart"); //watch
-
-        this.Control_time(); //watch
-    }
-}
+//                        await Connection.db("Chilligames").collection("Users").updateMany({}, { $pullAll: { ["Servers." + list[i].name]: [String(Must_delete[a]._id)] } });//update one ->update
+//                    }
 
 
-new Server_manager().Control_time();
+//                    await Connection.db("Chilligames_Servers").collection(list[i].name).findOneAndDelete({ 'Setting.Active_Days': { $gt: 0 } });
+
+//                }
+//                Connection.close();
+
+//            } catch (e) {
+//                if (Connection.isConnected()) {
+//                    Connection.close();
+//                }
+//                console.log("server err");
+//                break;
+//            }
+
+//            await sleep(2000);
+//        }
+//        console.log("restart"); //watch
+
+//        this.Control_time(); //watch
+//    }
+//}
+
+
+//new Server_manager().Control_time();
 
 
