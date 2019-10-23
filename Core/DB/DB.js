@@ -1,24 +1,14 @@
 var db = require('mongodb');
 var mongostring = "mongodb://localhost:27017/admin";
 
-var Client = new db.MongoClient(mongostring, { useUnifiedTopology: true, useNewUrlParser: true });
-
+var Client = async () => { return await new db.MongoClient(mongostring, { useNewUrlParser: true, useUnifiedTopology: true }).connect() };
 
 module.exports.Insert_doc = async (DB, Collection, Doc) => {
-    var result = "";
 
-    while (result.length < 1) {
+    Doc._id = new db.ObjectId();
+    var connection = await Client();
 
-        if (await Client.isConnected()) {
-            var id = await Client.db(DB).collection(Collection).insertOne(Doc);
-            result = await id.insertedId.toHexString();
-        } else {
-            await Client.connect();
-        }
-        if (result.length > 1) {
-            break;
-        }
-    }
-    return result;
+    var id = await connection.db(DB).collection(Collection).insertOne(Doc);
+
+    return id.insertedId.toHexString();
 }
-

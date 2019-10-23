@@ -41,9 +41,6 @@
     <Content Include="Core\Models.js">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="DB.js">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>
