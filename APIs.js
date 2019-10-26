@@ -1,7 +1,7 @@
 ﻿var Express = require('express');
 var app_api = Express();
 var Aut = require('./Core/UserManager');
-
+var Server_manager = require('./Core/ServerManager');
 
 
 
@@ -34,6 +34,24 @@ app_api.put("/APIs/aut", (req, res) => {
     }
 
 
-}).listen("3333", "0.0.0.0")
+}).listen("3333", "0.0.0.0");
+
+
+
+app_api.put("/APIs/Server_manager", (req, res) => {
+
+    var Pipe_line = req.header("Pipe_line");
+    switch (Pipe_line) {
+        case "": {
+
+            Server_manager.Push_data_to_server();
+        } break;
+
+    }
+
+
+
+}).listen("3334", "0.0.0.0")
+
 
 

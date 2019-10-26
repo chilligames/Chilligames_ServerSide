@@ -4,7 +4,9 @@ var Models = require('./Models');
 module.exports.Quick_Register = async () => {
 
     var result = await DB.Insert_doc("Chilligames", "Users", Models.Model_user);
+
     console.log("add nickname ");//dont delete
+
     return result;
 
 };

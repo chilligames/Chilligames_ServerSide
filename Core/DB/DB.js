@@ -10,5 +10,12 @@ module.exports.Insert_doc = async (DB, Collection, Doc) => {
 
     var id = await connection.db(DB).collection(Collection).insertOne(Doc);
 
+    await connection.close();
     return id.insertedId.toHexString();
+}
+
+
+module.exports.Connection = async () => {
+
+    await Client();
 }
