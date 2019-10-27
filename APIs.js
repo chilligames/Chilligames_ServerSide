@@ -41,10 +41,18 @@ app_api.put("/APIs/aut", (req, res) => {
 app_api.put("/APIs/Server_manager", (req, res) => {
 
     var Pipe_line = req.header("Pipe_line");
-    switch (Pipe_line) {
-        case "": {
+    var DB_name = req.header("DB_Name");
+    var Collection_Name = req.header("Collection_Name");
+    var _id_doc = req.header("_id_doc");
+    var Pipe_line_data = req.header("Pipe_line_data");
+    var Data = req.header("Data");
 
-            Server_manager.Push_data_to_server();
+    switch (Pipe_line) {
+        case "PDSTAS": {
+            Server_manager.Push_data_string_to_arry_server(DB_name, Collection_Name, _id_doc, Pipe_line_data, Data).then(() => {
+
+                res.end();
+            });
         } break;
 
     }
