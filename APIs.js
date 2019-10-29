@@ -45,6 +45,12 @@ app_api.get("/APIs", (req, res) => {
 
 
         } break;
+        case "RWUPE": {
+            DB.Register_with_user_pass_email(Username, Password, Email).then(result => {
+                res.send(result);
+                res.end()
+            });
+        } break;
         case "QL": {
 
             DB.Quick_login(_id).then(result => {
@@ -426,7 +432,7 @@ app_api.get("/APIs", (req, res) => {
  */
 
 var mongo_raw = require('mongodb');
-var Mongo_string = "mongodb://localhost:33323/admin"; //change to 33323
+var Mongo_string = "mongodb://localhost:27017/admin"; //change to 33323
 
 class DB_model {
 
@@ -544,6 +550,26 @@ class DB_model {
         connected.close();
 
         return Result_insert.insertedId.toHexString();
+    }
+
+
+    async Register_with_user_pass_email(incoming_Username, incoming_password, incoming_email) {
+        var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
+
+        var finder_username = await connection.db("Chilligames").collection("Users").findOne({ 'Info.Username': incoming_Username });
+        var result = "";
+        if (finder_username!=null) {
+            result = "0";
+        } else {
+            this.Raw_Model_User.Info.Username = incoming_Username;
+            this.Raw_Model_User.Info.Email = incoming_email;
+            this.Raw_Model_User.Info.Nickname = incoming_Username;
+            this.Raw_Model_User.Info.Password = incoming_password;
+
+           var result_insert=await connection.db("Chilligames").collection("Users").insertOne(this.Raw_Model_User);
+            result = result_insert.insertedId.toHexString();
+        }
+        return result;
     }
 
 
@@ -1371,7 +1397,7 @@ class DB_model {
         } catch (e) {
 
             Connection.close();
-            console.log("ERR_Cheack_new_message"+Incomig_id);
+            console.log("ERR_Cheack_new_message" + Incomig_id);
         }
     }
 
@@ -1760,7 +1786,7 @@ class Admins {
             }
             console.log("ERR=>Send_log_user");
         }
-         //test
+        //test
     }
 
 }
