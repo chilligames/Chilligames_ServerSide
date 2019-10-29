@@ -15,7 +15,6 @@ app_api.put("/APIs/aut", (req, res) => {
     var Password = req.header("Password");
 
     switch (pipe_line) {
-
         case "QR": {
             Aut.Quick_Register().then((result) => {
                 res.send(result);
@@ -59,7 +58,14 @@ app_api.put("/APIs/Server_manager", (req, res) => {
 
 
 
-}).listen("3334", "0.0.0.0")
+}).listen("3334", "0.0.0.0");
+
+
+app_api.put("/APIs/Data_manager", (req, res) => {
+
+    
+
+}).listen("3335", "0,0,0,0");
 
 
 

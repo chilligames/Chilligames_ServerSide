@@ -20,5 +20,4 @@ module.exports.Register_Username_email_password = async (Username, Email, Passwo
 
     var result = await DB.Insert_doc("Chilligames", "Users", Models.Model_user);
     return result;
-
 };
