@@ -48,7 +48,7 @@ app_api.get("/APIs", (req, res) => {
         case "RWUPE": {
             DB.Register_with_user_pass_email(Username, Password, Email).then(result => {
                 res.send(result);
-                res.end()
+                res.end();
             });
         } break;
         case "QL": {
@@ -555,7 +555,6 @@ class DB_model {
 
     async Register_with_user_pass_email(incoming_Username, incoming_password, incoming_email) {
         var connection = await new mongo_raw.MongoClient(Mongo_string, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
-
         var finder_username = await connection.db("Chilligames").collection("Users").findOne({ 'Info.Username': incoming_Username });
         var result = "";
         if (finder_username!=null) {
@@ -563,12 +562,13 @@ class DB_model {
         } else {
             this.Raw_Model_User.Info.Username = incoming_Username;
             this.Raw_Model_User.Info.Email = incoming_email;
-            this.Raw_Model_User.Info.Nickname = incoming_Username;
+            this.Raw_Model_User.Info.Nickname = incoming_Username+Math.random();
             this.Raw_Model_User.Info.Password = incoming_password;
 
            var result_insert=await connection.db("Chilligames").collection("Users").insertOne(this.Raw_Model_User);
             result = result_insert.insertedId.toHexString();
         }
+        connection.close();
         return result;
     }
 
