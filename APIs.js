@@ -432,7 +432,7 @@ app_api.get("/APIs", (req, res) => {
  */
 
 var mongo_raw = require('mongodb');
-var Mongo_string = "mongodb://localhost:27017/admin"; //change to 33323
+var Mongo_string = "mongodb://localhost:33323/admin"; //change to 33323
 
 class DB_model {
 
